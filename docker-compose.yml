@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  db:
+    # Use the official postgres image from Docker Hub
+    image: postgres:16-alpine
+    container_name: crsdb
+    restart: always
+
+    # Environment variables for configuration
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB} 
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} 
+
+    # Map the container port 5432 to your host machine's port 5432
+    # You can change the host port (left side) if 5432 is already in use.
+    ports:
+      - "5432:5432"
+
+    # Define a named volume to persist your database data
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+volumes:
+  postgres_data:
