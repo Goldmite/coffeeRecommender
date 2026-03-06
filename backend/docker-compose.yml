@@ -5,7 +5,7 @@ services:
     # Use the official postgres image from Docker Hub
     image: postgres:16-alpine
     container_name: crsdb
-    restart: always
+    restart: "no"
 
     # Environment variables for configuration
     environment:
