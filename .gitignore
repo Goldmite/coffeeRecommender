@@ -1,4 +1,6 @@
 .gitattributes
+.vscode/
+
 
 # ignore backend
 .gradle
@@ -10,8 +12,9 @@ build/
 
 # ignore frontend
 **/node_modules
-**/frontend/dist
-**/frontend/build
+**/dist/
+**/build/
+.svelte-kit/
 
 # secrets
 .env
