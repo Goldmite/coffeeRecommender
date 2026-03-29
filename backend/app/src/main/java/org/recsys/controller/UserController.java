@@ -1,15 +1,18 @@
 package org.recsys.controller;
 
-import org.recsys.model.User;
+import org.recsys.dto.user.UserLoginRequest;
+import org.recsys.dto.user.UserResponse;
+import org.recsys.dto.user.UserSignupRequest;
 import org.recsys.service.UserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -19,18 +22,21 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+    @PostMapping("/signup")
+    public ResponseEntity<UserResponse> signup(@Valid @RequestBody UserSignupRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.signup(request));
     }
 
-    @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    @PostMapping("/login")
+    public ResponseEntity<UserResponse> login(@Valid @RequestBody UserLoginRequest request) {
+        return ResponseEntity.ok(userService.login(request));
     }
-
-    @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
-    }
+    /*
+     * Add when needed and test it
+     * 
+     * @GetMapping("/{id}")
+     * public User getUserById(@PathVariable Long id) {
+     * return userService.getUserById(id);
+     * }
+     */
 }

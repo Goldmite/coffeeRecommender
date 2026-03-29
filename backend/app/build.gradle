@@ -4,16 +4,27 @@
  * This generated file contains a sample Java application project to get you started.
  * For more details on building Java & JVM projects, please refer to https://docs.gradle.org/9.2.0/userguide/building_java_projects.html in the Gradle documentation.
  */
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        //implementation "org.flywaydb:flyway-database-postgresql"
+        classpath "org.flywaydb:flyway-database-postgresql:12.1.1"
+    }
+}
 
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'java'
     id 'org.springframework.boot' version '4.0.0'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.flywaydb.flyway' version "12.1.1"
 }
 
 group='org.recsys'
 version='0.0.1'
+
 
 repositories {
     // Use Maven Central for resolving dependencies.
@@ -21,25 +32,47 @@ repositories {
 }
 
 dependencies {
-    // Use JUnit Jupiter for testing.
-    testImplementation libs.junit.jupiter
-
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     // This dependency is used by the application.
     implementation libs.guava
 
-    // Spring Boot Starter Web: Includes Tomcat and Spring MVC for building web applications.
+    // Spring Boot Starter
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     // Spring Boot Developer Tools: Provides fast application restarts and live reloading during development.
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    // Spring Boot Starter Test: Provides libraries for testing Spring Boot applications.
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     
+    // Lombok annotation
     compileOnly "org.projectlombok:lombok:1.18.44"
     annotationProcessor "org.projectlombok:lombok:1.18.44"
+    // Flyway migration
+    implementation 'org.flywaydb:flyway-core:12.1.1'
+    implementation 'org.flywaydb:flyway-database-postgresql:12.1.1'
+    // Postgres driver
+    runtimeOnly 'org.postgresql:postgresql'
+    // .env
+    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+
+    /// --- TESTING ---
+    // Use JUnit Jupiter for testing.
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // Spring Boot Starter Test: Provides libraries for testing Spring Boot applications.
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    // H2 DB driver
+    testRuntimeOnly 'com.h2database:h2'
 }
+
+flyway {
+    url = 'jdbc:postgresql://[::1]:5432/crsdb' //+System.getenv('POSTGRES_DB')
+    user = System.getenv('POSTGRES_USER')
+    password = System.getenv('POSTGRES_PASSWORD')
+}
+
+flywayMigrate.dependsOn classes
 
 test {
   useJUnitPlatform()
@@ -47,7 +80,7 @@ test {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
