@@ -8,38 +8,37 @@ import org.springframework.context.annotation.Bean;
 import javax.sql.DataSource;
 
 import io.github.cdimascio.dotenv.Dotenv;
+
 /**
  * The main entry point for the layered application.
- * This class typically initializes the application context and starts the server.
+ * This class typically initializes the application context and starts the
+ * server.
  */
 @SpringBootApplication
 public class App {
 
   @Bean
   public Flyway flyway(DataSource dataSource) {
-      Flyway flyway = Flyway.configure()
-              .dataSource(dataSource)
-              .locations("classpath:db/migration")
-              .baselineOnMigrate(true)
-              .load();
-      
-      System.out.println("Checking for migrations...");
-      flyway.migrate();
-      System.out.println("Migrations applied successfully!");
-      
-      return flyway;
+    Flyway flyway = Flyway.configure()
+        .dataSource(dataSource)
+        .locations("classpath:db/migration")
+        .baselineOnMigrate(true)
+        .load();
+
+    System.out.println("Checking for migrations...");
+    flyway.migrate();
+    System.out.println("Migrations applied successfully!");
+
+    return flyway;
   }
-    
+
   public static void main(String[] args) {
 
     Dotenv dotenv = Dotenv.configure()
-      .directory("../")
-      .ignoreIfMissing()
-      .load();
+        .directory("../")
+        .ignoreIfMissing()
+        .load();
     dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
-    //System.setProperty("POSTGRES_DB", dotenv.get("POSTGRES_DB"));
-    //System.setProperty("POSTGRES_USER", dotenv.get("POSTGRES_USER"));
-    //System.setProperty("POSTGRES_PASSWORD", dotenv.get("POSTGRES_PASSWORD"));
 
     SpringApplication.run(App.class, args);
   }

@@ -7,3 +7,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+  flyway:
+    enabled: true
+
+app:
+  cors:
+    allowed-origin: http://localhost:5173
+  jwt:
+    secret: ${JWT_SECRET:static_fallback_secret_for_development}
+    expiration: 86400000 # 24 hours

@@ -8,19 +8,34 @@ import org.recsys.model.User;
 import org.recsys.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
     private static final String INVALID_EMAIL_OR_PASSWORD = "Invalid email or password";
-    // private static final String USER_NOT_FOUND = "User not found";
+    private static final String USER_NOT_FOUND = "User not found: ";
     private static final String USER_ALREADY_EXISTS = "User already exists";
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND + email));
+
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getEmail())
+                .password(user.getPasswordHash())
+                .authorities("USER")
+                .build();
+    }
 
     public UserResponse signup(UserSignupRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
