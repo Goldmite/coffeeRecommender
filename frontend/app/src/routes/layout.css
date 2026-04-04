@@ -1,1 +1,34 @@
 @import 'tailwindcss';
+@plugin '@iconify/tailwind4';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+	--color-light: theme(--color-taupe-300);
+	--color-dark: theme(--color-taupe-900);
+	--color-white-taupe: theme(--color-taupe-50);
+	--color-black-taupe: theme(--color-taupe-950);
+
+	--color-main: var(--color-light);
+	--color-main-text: var(--color-black-taupe);
+
+	--color-secondary: theme(--color-olive-800);
+
+	--color-main-mid: theme(--color-taupe-500);
+
+	--color-main-border: theme(--color-taupe-400);
+}
+
+@layer base {
+	.dark {
+		--color-main: var(--color-dark);
+		--color-main-text: var(--color-white-taupe);
+		--color-main-border: theme(--color-taupe-700);
+	}
+}
+
+@layer base {
+	body {
+		@apply bg-main text-main-text transition-colors;
+	}
+}
