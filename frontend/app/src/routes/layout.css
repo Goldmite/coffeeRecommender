@@ -31,4 +31,8 @@
 	body {
 		@apply bg-main text-main-text transition-colors;
 	}
+	.btn-round-sm {
+		border-radius: calc(infinity * 1px);
+		padding: 0.5rem;
+	}
 }
