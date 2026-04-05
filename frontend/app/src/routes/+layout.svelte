@@ -9,8 +9,8 @@
 	let isDarkTheme = $state(false);
 
 	function toggleTheme() {
-		const isDark = document.documentElement.classList.toggle('dark');
-		localStorage.setItem('theme', isDark ? 'dark' : 'light');
+		isDarkTheme = document.documentElement.classList.toggle('dark');
+		localStorage.setItem('theme', isDarkTheme ? 'dark' : 'light');
 	}
 </script>
 
@@ -28,45 +28,48 @@
 	</script>
 </svelte:head>
 
-<header
-	class="sticky top-0 flex h-16 w-full items-center justify-between bg-secondary p-4 text-white-taupe"
->
-	<a href="/" class="text-xl font-bold uppercase"> {m.coffee_recommender_system()} </a>
-	<div class="flex h-8 justify-items-center gap-4">
-		<button class="toggle-icon" type="button" aria-label="Toggle dark theme" onclick={toggleTheme}>
-			<div class="flex items-center">
-				{#if isDarkTheme}
-					<span class="icon-[streamline--coffee-bean] text-main-mid"></span>
-				{:else}
-					<span class="text-bean-roast icon-[streamline--coffee-bean-solid] text-main-mid"></span>
-				{/if}
-			</div>
-		</button>
-		{#if getLocale() === 'lt'}
+<div class="flex min-h-svh flex-col">
+	<header
+		class="sticky top-0 flex h-16 w-full items-center justify-between bg-primary p-4 text-white-taupe shadow-lg"
+	>
+		<a href="/home" class="text-xl font-bold uppercase"> {m.coffee_recommender_system()} </a>
+		<div class="flex h-8 justify-items-center gap-4">
 			<button
-				class="toggle-icon font-light"
+				class="toggle-icon"
 				type="button"
-				aria-label="Toggle language to English"
-				onclick={() => setLocale('en')}
-				><span>EN</span>
+				aria-label="Toggle dark theme"
+				onclick={toggleTheme}
+			>
+				<div class="flex items-center">
+					<span class="icon-[streamline--coffee-bean-solid] bg-main"></span>
+				</div>
 			</button>
-		{:else}
-			<button
-				class="toggle-icon font-light"
-				type="button"
-				aria-label="Toggle language to Lithuanian"
-				onclick={() => setLocale('lt')}
-				><span>LT</span>
-			</button>
-		{/if}
+			{#if getLocale() === 'lt'}
+				<button
+					class="toggle-icon font-light"
+					type="button"
+					aria-label="Toggle language to English"
+					onclick={() => setLocale('en')}
+					><span>EN</span>
+				</button>
+			{:else}
+				<button
+					class="toggle-icon font-light"
+					type="button"
+					aria-label="Toggle language to Lithuanian"
+					onclick={() => setLocale('lt')}
+					><span>LT</span>
+				</button>
+			{/if}
+		</div>
+	</header>
+
+	<div class="flex flex-1 p-4">
+		{@render children()}
 	</div>
-</header>
 
-<div class="min-h-svh w-full p-4">
-	{@render children()}
+	<footer></footer>
 </div>
-
-<footer></footer>
 
 <style>
 	.toggle-icon {

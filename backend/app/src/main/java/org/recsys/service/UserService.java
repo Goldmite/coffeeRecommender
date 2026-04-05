@@ -14,6 +14,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.transaction.Transactional;
+
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
@@ -37,9 +40,10 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
+    @Transactional
     public UserResponse signup(UserSignupRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException(USER_ALREADY_EXISTS);
+            throw new EntityExistsException(USER_ALREADY_EXISTS);
         }
 
         User newUser = new User();

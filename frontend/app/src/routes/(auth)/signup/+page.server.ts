@@ -1,12 +1,12 @@
 import { fail, redirect, type Actions } from '@sveltejs/kit';
 import { PUBLIC_API_BASE_URL } from '$env/static/public';
+import { m } from '$lib/paraglide/messages.js';
 
 export const actions = {
 	default: async ({ request, fetch }) => {
 		const formData = await request.formData();
 		const name = formData.get('name');
 		const email = formData.get('email');
-		//const password = formData.get('password');
 
 		const res = await fetch(`${PUBLIC_API_BASE_URL}/users/signup`, {
 			method: 'POST',
@@ -14,22 +14,25 @@ export const actions = {
 			body: JSON.stringify(Object.fromEntries(formData)),
 		});
 
-		console.log(res);
-
 		if (res.status === 400) {
-			const validationErrors = await res.json();
-			return fail(400, { validationErrors, name, email });
-		}
-		if (res.status === 403) {
-			return fail(403, { error: 'Access Forbidden.' });
+			return fail(400, {
+				error: true,
+				email,
+				name,
+				msg: m.auth_err_bad_request(),
+			});
 		}
 		if (res.status === 409) {
-			return fail(409, { conflictError: 'User already exists.', field: 'email', name, email });
+			return fail(409, {
+				conflictError: true,
+				name,
+				msg: m.auth_err_email_taken(),
+			});
 		}
 		if (!res.ok) {
-			return fail(res.status, { error: 'An unexpected error occurred.' });
+			return fail(res.status, { error: m.err_unexpected() });
 		}
 
-		throw redirect(303, '/login?signup_success=true');
+		throw redirect(303, '/login');
 	},
 } satisfies Actions;

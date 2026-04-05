@@ -15,3 +15,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+app:
+  jwt:
+    secret: staticfallbacksecretkeyfordevelopment256bit
+    expiration: 86400000 # 24 hours

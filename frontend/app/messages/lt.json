@@ -1,4 +1,16 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"coffee_recommender_system": "Kavos rekomendavimo sistema"
+	"coffee_recommender_system": "Kavos rekomendavimo sistema",
+	"user_name": "Vardas",
+	"user_email": "El. paštas",
+	"user_password": "Slaptažodis",
+	"user_login": "Prisijungti",
+	"user_signup": "Registruotis",
+	"user_prompt_has_account": "Turite paskyrą?",
+	"user_prompt_no_account": "Neturite paskyros?",
+	"auth_err_bad_request": "Blogas prašymas.",
+	"auth_err_no_access": "Neteisingi prisijungimo duomenys.",
+	"err_unexpected": "Įvyko netikėta klaida.",
+	"auth_prompt_password_format": "Slaptažodyje turi būti bent viena didžioji raidė, viena mažoji raidė ir vienas skaitmuo",
+	"auth_err_email_taken": "El. paštas paimtas."
 }
