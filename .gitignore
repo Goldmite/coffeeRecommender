@@ -9,6 +9,7 @@ bin/
 build/
 .settings
 *.classpath
+backend/google_style.xml
 
 # ignore frontend
 **/node_modules
@@ -16,7 +17,7 @@ build/
 **/build/
 .svelte-kit/
 
+**/package-lock.json
+
 # secrets
 .env
-
-

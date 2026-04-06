@@ -1,0 +1,16 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "coffee_recommender_system": "Coffee Recommender System",
+  "user_name": "Name",
+  "user_email": "Email",
+  "user_password": "Password",
+  "user_login": "Login",
+  "user_signup": "Signup",
+  "user_prompt_has_account": "Have an account?",
+  "user_prompt_no_account": "Don't have an account?",
+  "auth_err_bad_request": "Bad request.",
+  "auth_err_no_access": "Incorrect credentials.",
+  "auth_err_email_taken": "Email is taken.",
+  "err_unexpected": "An unexpected error occurred.",
+  "auth_prompt_password_format": "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character"
+}

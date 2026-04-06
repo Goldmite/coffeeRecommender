@@ -1,1 +1,64 @@
 @import 'tailwindcss';
+@plugin '@iconify/tailwind4';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+	--color-light: theme(--color-taupe-300);
+	--color-dark: theme(--color-taupe-900);
+	--color-white-taupe: theme(--color-taupe-50);
+	--color-black-taupe: theme(--color-taupe-950);
+
+	--color-main: var(--color-light);
+	--color-main-text: var(--color-black-taupe);
+
+	--color-primary: #707d54;
+	--color-secondary: #61547d;
+
+	--color-main-mid: theme(--color-taupe-500);
+
+	--color-main-border: theme(--color-taupe-400);
+
+	--color-error: #a8524d;
+	--color-success: #4c9e51;
+
+	--inset-shadow-md: inset 2px 5px 4px var(--color-taupe-700);
+}
+
+@layer base {
+	.dark {
+		--color-main: var(--color-dark);
+		--color-main-text: var(--color-white-taupe);
+		--color-main-border: theme(--color-taupe-700);
+	}
+}
+
+@layer base {
+	body {
+		@apply bg-main text-main-text transition-colors;
+	}
+	h1 {
+		font-size: var(--text-4xl);
+	}
+	input {
+		@apply w-full rounded-md border-2 border-main-border bg-white-taupe p-1 dark:bg-black-taupe;
+	}
+	input:focus {
+		@apply border-secondary outline-none;
+	}
+
+	.btn-round-sm {
+		border-radius: calc(infinity * 1px);
+		padding: 0.5rem;
+	}
+	.btn-wide {
+		@apply w-full rounded-xl p-2;
+	}
+
+	.error-banner {
+		@apply rounded-sm bg-error p-2;
+	}
+	.error-text {
+		@apply text-sm text-error;
+	}
+}
