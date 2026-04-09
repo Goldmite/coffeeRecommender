@@ -3,6 +3,7 @@ package org.recsys.testutil;
 import org.recsys.dto.user.UserLoginRequest;
 import org.recsys.dto.user.UserSignupRequest;
 import org.recsys.model.User;
+import org.recsys.model.UserRole;
 
 public class TestDataFactory {
 
@@ -15,7 +16,7 @@ public class TestDataFactory {
     }
 
     public static User createUser(String name, String email, String pw_hash) {
-        return new User(1L, name, email, pw_hash);
+        return new User(1L, name, email, pw_hash, UserRole.USER);
     }
 
     public static UserSignupRequest validSignup() {
