@@ -40,6 +40,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // Advanced Postgres types
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-71:3.15.2'
+
     // Spring Boot Developer Tools: Provides fast application restarts and live reloading during development.
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     
@@ -67,12 +70,14 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testImplementation 'org.springframework.security:spring-security-test'
-    // H2 DB driver
-    testRuntimeOnly 'com.h2database:h2'
+    // Test DB that works for pgvector postgres
+    testImplementation 'org.testcontainers:postgresql:1.19.0'
+    testImplementation 'org.testcontainers:junit-jupiter:1.19.0'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
 }
 
 flyway {
-    url = 'jdbc:postgresql://[::1]:5432/crsdb' //+System.getenv('POSTGRES_DB')
+    url = 'jdbc:pgvector/pgvector:pg16://[::1]:5432/crsdb' //+System.getenv('POSTGRES_DB')
     user = System.getenv('POSTGRES_USER')
     password = System.getenv('POSTGRES_PASSWORD')
 }
