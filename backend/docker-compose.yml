@@ -1,7 +1,7 @@
 services:
   db:
     # Use the official postgres image from Docker Hub
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     container_name: crsdb
     restart: "no"
 

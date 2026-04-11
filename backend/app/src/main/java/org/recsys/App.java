@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import org.flywaydb.core.Flyway;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+
 import javax.sql.DataSource;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -15,6 +17,7 @@ import io.github.cdimascio.dotenv.Dotenv;
  * server.
  */
 @SpringBootApplication
+@EnableJpaAuditing
 public class App {
 
   @Bean

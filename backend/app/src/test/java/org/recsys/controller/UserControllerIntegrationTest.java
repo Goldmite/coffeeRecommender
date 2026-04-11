@@ -7,6 +7,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.recsys.config.TestConfig;
 import org.recsys.dto.user.UserLoginRequest;
 import org.recsys.dto.user.UserSignupRequest;
 import org.recsys.model.User;
@@ -15,6 +16,7 @@ import org.recsys.testutil.TestDataFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
@@ -25,6 +27,7 @@ import tools.jackson.databind.ObjectMapper;
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
+@Import(TestConfig.class)
 class UserControllerIntegrationTest {
 
     private static String USER_API = "/api/users";
