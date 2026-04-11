@@ -1,7 +1,11 @@
 package org.recsys.model;
 
+import io.hypersistence.utils.hibernate.type.array.ListArrayType;
 import io.hypersistence.utils.hibernate.type.range.PostgreSQLRangeType;
 import io.hypersistence.utils.hibernate.type.range.Range;
+
+import java.util.List;
+
 import org.hibernate.annotations.Type;
 
 import jakarta.persistence.Column;
@@ -49,6 +53,9 @@ public class CoffeeFeatures {
     private Integer aftertaste;
     private Integer sweetness;
     private Integer bitterness;
+
+    @Column(columnDefinition = "text[]")
+    private List<String> flavorNotes;
 
     @Column(columnDefinition = "vector(100)")
     private float[] flavorVector;

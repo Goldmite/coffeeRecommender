@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS coffee_features (
     aftertaste SMALLINT,
     sweetness SMALLINT,
     bitterness SMALLINT,
+    flavor_notes VARCHAR(32)[],
     flavor_vector VECTOR(100),
 
     CONSTRAINT fk_coffee_bean_id FOREIGN KEY (coffee_id) REFERENCES coffee_beans(id) ON DELETE CASCADE
