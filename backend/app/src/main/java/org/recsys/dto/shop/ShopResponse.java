@@ -1,18 +1,29 @@
 package org.recsys.dto.shop;
 
+import org.recsys.model.Shop;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Value;
 
-@Getter
-@AllArgsConstructor
+@Value
+@Builder
 public class ShopResponse {
 
-    private Integer id;
-    private String name;
-    private String shopUrl;
+    Integer id;
+    String name;
+    String shopUrl;
 
     @JsonProperty("is_active")
-    private Boolean isActive;
+    Boolean isActive;
+
+    public static ShopResponse fromEntity(Shop shop) {
+        return ShopResponse.builder()
+                .id(shop.getId())
+                .name(shop.getName())
+                .shopUrl(shop.getShopUrl())
+                .isActive(shop.getIsActive())
+                .build();
+    }
 }
