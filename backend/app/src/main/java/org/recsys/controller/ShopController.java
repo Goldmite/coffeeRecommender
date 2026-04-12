@@ -45,8 +45,9 @@ public class ShopController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> removeShops() {
-
+    public ResponseEntity<Void> removeShops(@RequestBody List<Integer> ids) {
+        shopService.deleteShops(ids);
+        return ResponseEntity.noContent().build();
     }
 
 }

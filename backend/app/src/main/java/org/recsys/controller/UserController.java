@@ -30,7 +30,7 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<UserResponse> signup(@Valid @RequestBody UserSignupRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.signup(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.fromEntity(userService.signup(request)));
     }
 
     @PostMapping("/login")
@@ -38,10 +38,10 @@ public class UserController {
         authManager
                 .authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-        UserResponse user = userService.login(request);
+        UserResponse userRes = UserResponse.fromEntity(userService.login(request));
         String token = jwtUtils.generateToken(request.getEmail());
 
-        return ResponseEntity.ok(new AuthResponse(token, user));
+        return ResponseEntity.ok(new AuthResponse(token, userRes));
     }
     /*
      * Add when needed and test it

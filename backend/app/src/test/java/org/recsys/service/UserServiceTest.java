@@ -17,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.recsys.dto.user.UserLoginRequest;
-import org.recsys.dto.user.UserResponse;
 import org.recsys.dto.user.UserSignupRequest;
 import org.recsys.model.User;
 import org.recsys.repository.UserRepository;
@@ -44,7 +43,7 @@ class UserServiceTest {
         when(userRepository.findByEmail(req.getEmail())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(req.getPassword())).thenReturn("hashedPassword");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        UserResponse res = userService.signup(req);
+        User res = userService.signup(req);
         // then
         assertNotNull(res);
         assertEquals(req.getName(), res.getName());
@@ -75,7 +74,7 @@ class UserServiceTest {
         // when
         when(userRepository.findByEmail(req.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(req.getPassword(), hashedPassword)).thenReturn(true);
-        UserResponse res = userService.login(req);
+        User res = userService.login(req);
         // then
         assertNotNull(res);
         assertEquals(user.getId(), res.getId());

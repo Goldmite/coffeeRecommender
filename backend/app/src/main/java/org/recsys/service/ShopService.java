@@ -51,4 +51,9 @@ public class ShopService {
         }
         return shopRepository.saveAll(shops);
     }
+
+    @Transactional
+    public void deleteShops(List<Integer> ids) {
+        shopRepository.deleteAllById(ids);
+    }
 }

@@ -41,7 +41,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public UserResponse signup(UserSignupRequest request) {
+    public User signup(UserSignupRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new EntityExistsException(USER_ALREADY_EXISTS);
         }
@@ -51,12 +51,10 @@ public class UserService implements UserDetailsService {
         newUser.setEmail(request.getEmail());
         newUser.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 
-        User saved = userRepository.save(newUser);
-
-        return new UserResponse(saved.getId(), saved.getName(), saved.getEmail());
+        return userRepository.save(newUser);
     }
 
-    public UserResponse login(UserLoginRequest request) {
+    public User login(UserLoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new InvalidCredentialsException(INVALID_EMAIL_OR_PASSWORD));
 
@@ -64,7 +62,7 @@ public class UserService implements UserDetailsService {
             throw new InvalidCredentialsException(INVALID_EMAIL_OR_PASSWORD);
         }
 
-        return new UserResponse(user.getId(), user.getName(), user.getEmail());
+        return user;
     }
 
     /*
