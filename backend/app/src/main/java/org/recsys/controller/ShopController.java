@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.recsys.dto.shop.ShopRequest;
 import org.recsys.dto.shop.ShopResponse;
+import org.recsys.dto.shop.ShopUpdateRequest;
 import org.recsys.service.ShopService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,12 +40,12 @@ public class ShopController {
     }
 
     @PutMapping
-    public ResponseEntity updateShopInfo() {
-
+    public ResponseEntity<List<ShopResponse>> updateShopInfo(@RequestBody List<ShopUpdateRequest> req) {
+        return ResponseEntity.ok(shopService.updateShops(req).stream().map(ShopResponse::fromEntity).toList());
     }
 
     @DeleteMapping
-    public ResponseEntity removeShops() {
+    public ResponseEntity<Void> removeShops() {
 
     }
 
