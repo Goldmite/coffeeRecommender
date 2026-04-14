@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS coffee_beans (
     id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(96) NOT NULL,
-    price DECIMAL(5, 2),
+    name TEXT NOT NULL,
+    price DECIMAL(10, 4),
     product_url TEXT,
     shop_id INT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
