@@ -1,7 +1,6 @@
 package org.recsys.service;
 
 import org.recsys.dto.user.UserLoginRequest;
-import org.recsys.dto.user.UserResponse;
 import org.recsys.dto.user.UserSignupRequest;
 import org.recsys.exception.InvalidCredentialsException;
 import org.recsys.model.User;

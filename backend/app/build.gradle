@@ -49,6 +49,10 @@ dependencies {
     // Lombok annotation
     compileOnly "org.projectlombok:lombok:1.18.44"
     annotationProcessor "org.projectlombok:lombok:1.18.44"
+
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
     // Flyway migration
     implementation 'org.flywaydb:flyway-core:12.1.1'
     implementation 'org.flywaydb:flyway-database-postgresql:12.1.1'

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -34,13 +35,13 @@ public class ShopController {
     }
 
     @PostMapping
-    public ResponseEntity<List<ShopResponse>> addShops(@RequestBody List<ShopRequest> req) {
+    public ResponseEntity<List<ShopResponse>> addShops(@Valid @RequestBody List<ShopRequest> req) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(shopService.createShops(req).stream().map(ShopResponse::fromEntity).toList());
     }
 
     @PutMapping
-    public ResponseEntity<List<ShopResponse>> updateShopInfo(@RequestBody List<ShopUpdateRequest> req) {
+    public ResponseEntity<List<ShopResponse>> updateShopInfo(@Valid @RequestBody List<ShopUpdateRequest> req) {
         return ResponseEntity.ok(shopService.updateShops(req).stream().map(ShopResponse::fromEntity).toList());
     }
 

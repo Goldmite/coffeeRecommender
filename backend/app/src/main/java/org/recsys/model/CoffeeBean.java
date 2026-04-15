@@ -1,5 +1,7 @@
 package org.recsys.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,7 +28,9 @@ public class CoffeeBean extends AuditEntity {
 
     @Column(nullable = false)
     private String name;
-    private double price;
+
+    @Column(precision = 10, scale = 4)
+    private BigDecimal price;
     private String productUrl;
 
     private int shopId;

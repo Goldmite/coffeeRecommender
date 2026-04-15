@@ -26,14 +26,14 @@ public class ShopRequest {
     @URL
     private String shopUrl;
 
-    @JsonProperty("is_active")
+    @JsonProperty("isActive")
     private Boolean isActive = false;
 
     public Shop toEntity() {
         Shop shop = new Shop();
-        shop.setName(name);
-        shop.setShopUrl(shopUrl);
-        shop.setIsActive(isActive);
+        shop.setName(this.name);
+        shop.setShopUrl(this.shopUrl);
+        shop.setIsActive(this.isActive);
         return shop;
     }
 }

@@ -32,8 +32,8 @@ public class CoffeeFeatures {
     @Column(name = "coffee_id")
     private Long id;
 
-    @Column(nullable = false)
-    private String origin;
+    @Column(columnDefinition = "text[]")
+    private List<String> origins;
     private String process;
 
     @Enumerated(EnumType.ORDINAL)
@@ -46,7 +46,7 @@ public class CoffeeFeatures {
     @Column(columnDefinition = "int4range")
     private Range<Integer> altitude;
 
-    private double scaScore;
+    private Double scaScore;
     private Integer acidity;
     private Integer body;
     private Integer aftertaste;
