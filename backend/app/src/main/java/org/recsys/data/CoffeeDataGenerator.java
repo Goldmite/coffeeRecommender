@@ -37,18 +37,18 @@ public class CoffeeDataGenerator {
                 .origins(generateOrigins())
                 .process(pickRandom(PROCESSES))
                 .roastLevel(roast)
-                .altitude(generateAltitude(origin.getFirst()))
+                .altitude(generateAltitude())
                 .scaScore(generateScaScore())
                 .acidity(pickFromscaleOneToTen())
                 .body(pickFromscaleOneToTen())
                 .aftertaste(pickFromscaleOneToTen())
                 .sweetness(pickFromscaleOneToTen())
                 .bitterness(pickFromscaleOneToTen())
-                .flavorNotes(generateNotes(roast, 3))
+                .flavorNotes(generateNotes(roast, 4))
                 .build();
         // coffee bean
         return CoffeeBeanRequest.builder()
-                .name(origin.getFirst() + "Coffee #" + coffeeNr)
+                .name(origin.getFirst() + " Coffee #" + coffeeNr)
                 .price(BigDecimal.valueOf(15.0 + (random.nextDouble() * 20.0)).setScale(2, RoundingMode.HALF_UP))
                 .productUrl("https://example.com/coffee/" + coffeeNr)
                 .shopId(random.nextInt(5) + 1)
@@ -57,9 +57,13 @@ public class CoffeeDataGenerator {
     }
 
     private List<String> generateOrigins() {
-        List<String> origins = List.of(pickRandom(ORIGINS));
+        List<String> origins = new ArrayList<>();
+        origins.add(pickRandom(ORIGINS));
         if (random.nextInt(100) < 15) {
-            origins.add(pickRandom(ORIGINS));
+            String anotherOrigin = pickRandom(ORIGINS);
+            if (!origins.contains(anotherOrigin)) {
+                origins.add(anotherOrigin);
+            }
         }
         return origins;
     }
@@ -78,9 +82,9 @@ public class CoffeeDataGenerator {
         return RoastLevel.DARK;
     }
 
-    private List<Integer> generateAltitude(String origin) {
-        int lower = 1000;
-        int upper = lower + random.nextInt(400);
+    private List<Integer> generateAltitude() {
+        int lower = 1000 + random.nextInt(7) * 100;
+        int upper = lower + random.nextInt(8) * 100;
         return List.of(lower, upper);
     }
 
@@ -89,7 +93,7 @@ public class CoffeeDataGenerator {
         // variance
         List<String> shuffled = new ArrayList<>(map);
         Collections.shuffle(shuffled);
-        return shuffled.subList(1, Math.min(count, shuffled.size()));
+        return shuffled.subList(0, Math.min(count, shuffled.size()));
     }
 
     private Double generateScaScore() {

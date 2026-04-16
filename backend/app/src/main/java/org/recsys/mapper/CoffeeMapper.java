@@ -54,7 +54,7 @@ public interface CoffeeMapper {
         if (list == null)
             return null;
 
-        return Range.closedOpen(list.getFirst(), list.getLast());
+        return Range.closed(list.getFirst(), list.getLast());
     }
 
     /**
@@ -64,7 +64,7 @@ public interface CoffeeMapper {
      * @return
      */
     default List<Integer> mapRangeToList(Range<Integer> range) {
-        if (range == null)
+        if (range == null || range.isEmpty())
             return null;
 
         return List.of(range.lower(), range.upper());

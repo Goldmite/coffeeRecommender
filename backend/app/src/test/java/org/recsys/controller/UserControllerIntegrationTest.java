@@ -109,7 +109,7 @@ class UserControllerIntegrationTest {
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(req)))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
