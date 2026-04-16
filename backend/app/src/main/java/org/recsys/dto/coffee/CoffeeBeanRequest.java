@@ -8,9 +8,15 @@ import org.recsys.model.CoffeeFeatures;
 import org.recsys.model.RoastLevel;
 
 import io.hypersistence.utils.hibernate.type.range.Range;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CoffeeBeanRequest {
 
     private String name;
@@ -20,6 +26,9 @@ public class CoffeeBeanRequest {
     private FeaturesRequest features;
 
     @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class FeaturesRequest {
 
         private List<String> origins;
