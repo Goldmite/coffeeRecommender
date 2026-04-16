@@ -21,6 +21,7 @@ import org.recsys.dto.user.UserSignupRequest;
 import org.recsys.model.User;
 import org.recsys.repository.UserRepository;
 import org.recsys.testutil.TestDataFactory;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
@@ -92,7 +93,7 @@ class UserServiceTest {
         when(userRepository.findByEmail(req.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(req.getPassword(), hashedPassword)).thenReturn(false);
         // then
-        assertThrows(RuntimeException.class, () -> userService.login(req));
+        assertThrows(BadCredentialsException.class, () -> userService.login(req));
     }
 
 }

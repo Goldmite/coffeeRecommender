@@ -2,11 +2,11 @@ package org.recsys.service;
 
 import org.recsys.dto.user.UserLoginRequest;
 import org.recsys.dto.user.UserSignupRequest;
-import org.recsys.exception.InvalidCredentialsException;
 import org.recsys.model.User;
 import org.recsys.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,13 +24,12 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
 
     private static final String INVALID_EMAIL_OR_PASSWORD = "Invalid email or password";
-    private static final String USER_NOT_FOUND = "User not found: ";
     private static final String USER_ALREADY_EXISTS = "User already exists";
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND + email));
+                .orElseThrow(() -> new UsernameNotFoundException(INVALID_EMAIL_OR_PASSWORD));
 
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
@@ -55,10 +54,10 @@ public class UserService implements UserDetailsService {
 
     public User login(UserLoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new InvalidCredentialsException(INVALID_EMAIL_OR_PASSWORD));
+                .orElseThrow(() -> new BadCredentialsException(INVALID_EMAIL_OR_PASSWORD));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new InvalidCredentialsException(INVALID_EMAIL_OR_PASSWORD);
+            throw new BadCredentialsException(INVALID_EMAIL_OR_PASSWORD);
         }
 
         return user;
