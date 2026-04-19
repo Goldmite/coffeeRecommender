@@ -12,10 +12,13 @@ import org.recsys.dto.coffee.CoffeeBeanRequest;
 import org.recsys.model.RoastLevel;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class CoffeeDataGenerator {
 
-    private final Random random = new Random();
+    private final Random random;
 
     private static final List<String> ORIGINS = List.of("Brazil", "Colombia", "Ethiopia", "Peru", "Kenya", "Nicaragua",
             "Guatemala", "Indonesia", "India");

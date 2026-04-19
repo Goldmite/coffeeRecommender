@@ -1,20 +1,23 @@
 package org.recsys.demo;
 
+import java.util.Random;
+
 import org.recsys.data.CoffeeDataGenerator;
 import org.recsys.service.CoffeeService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
 @Profile("demo")
+@RequiredArgsConstructor
 public class DemoSeeder implements CommandLineRunner {
 
-    @Autowired
-    private CoffeeDataGenerator generator;
-    @Autowired
-    private CoffeeService service;
+    private final CoffeeService service;
+
+    private final Random random;
     // @Autowired
     // private ShopService shopService;
 
@@ -30,9 +33,10 @@ public class DemoSeeder implements CommandLineRunner {
          * new ShopRequest("Shop E", "https://example.com", null));
          * shopService.createShops(shops);
          */
+        CoffeeDataGenerator gen = new CoffeeDataGenerator(random);
         System.out.println("Seeding 100 coffees...");
         for (int i = 1; i <= 100; i++) {
-            service.addCoffee(generator.generate(i));
+            service.addCoffee(gen.generate(i));
         }
     }
 }
