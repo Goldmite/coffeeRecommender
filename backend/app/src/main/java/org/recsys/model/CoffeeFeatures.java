@@ -39,8 +39,7 @@ public class CoffeeFeatures {
     @Enumerated(EnumType.ORDINAL)
     private RoastLevel roastLevel;
 
-    @Column(name = "description", columnDefinition = "vector(100)")
-    private float[] descriptionVector;
+    private String description;
 
     @Type(PostgreSQLRangeType.class)
     @Column(columnDefinition = "int4range")

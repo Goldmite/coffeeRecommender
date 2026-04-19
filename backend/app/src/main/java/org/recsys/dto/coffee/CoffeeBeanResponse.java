@@ -19,7 +19,7 @@ public class CoffeeBeanResponse {
     List<String> origins;
     String process;
     RoastLevel roastLevel;
-    // float[] description;
+    // String description;
     List<Integer> altitude;
     Double scaScore;
     Integer acidity;
