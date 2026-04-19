@@ -3,14 +3,17 @@ package org.recsys.dto.coffee;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.recsys.model.CoffeeBean;
-import org.recsys.model.CoffeeFeatures;
 import org.recsys.model.RoastLevel;
 
-import io.hypersistence.utils.hibernate.type.range.Range;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CoffeeBeanRequest {
 
     private String name;
@@ -20,6 +23,9 @@ public class CoffeeBeanRequest {
     private FeaturesRequest features;
 
     @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class FeaturesRequest {
 
         private List<String> origins;
@@ -33,30 +39,5 @@ public class CoffeeBeanRequest {
         private Integer sweetness;
         private Integer bitterness;
         private List<String> flavorNotes;
-    }
-
-    public CoffeeBean toEntity() {
-        CoffeeBean bean = new CoffeeBean();
-        bean.setName(this.name);
-        bean.setPrice(this.price);
-        bean.setProductUrl(this.productUrl);
-        bean.setShopId(this.shopId);
-
-        if (this.features != null) {
-            CoffeeFeatures f = new CoffeeFeatures();
-            f.setOrigins(this.features.getOrigins());
-            f.setProcess(this.features.getProcess());
-            f.setRoastLevel(this.features.getRoastLevel());
-            f.setScaScore(this.features.getScaScore());
-            f.setFlavorNotes(this.features.getFlavorNotes());
-            if (this.features.getAltitude() != null) {
-                f.setAltitude(
-                        Range.closed(this.features.getAltitude().getFirst(), this.features.getAltitude().getLast()));
-            }
-            f.setCoffeeBean(bean);
-            bean.setFeatures(f);
-        }
-
-        return bean;
     }
 }
