@@ -27,6 +27,7 @@ public interface CoffeeMapper {
     @Mapping(target = "origins", source = "features.origins")
     @Mapping(target = "process", source = "features.process")
     @Mapping(target = "roastLevel", source = "features.roastLevel")
+    // @Mapping(target = "description", source = "features.description")
     @Mapping(target = "altitude", source = "features.altitude")
     @Mapping(target = "scaScore", source = "features.scaScore")
     @Mapping(target = "acidity", source = "features.acidity")

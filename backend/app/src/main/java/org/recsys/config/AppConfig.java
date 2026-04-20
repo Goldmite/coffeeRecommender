@@ -7,7 +7,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class SeedConfig {
+public class AppConfig {
+
+    @Bean
+    public FeatureWeights featureWeights(@Value("${app.weights.soft-features}") float softFeatureWeight) {
+        return new FeatureWeights(softFeatureWeight);
+    }
 
     @Bean
     public Random seededRandom(@Value("${app.testdata.seed:1}") long seed) {

@@ -1,12 +1,12 @@
 spring:
-  #profiles: active: "demo"
+  profiles: 
+    active: "demo"
   datasource:
     url: jdbc:postgresql://localhost:5432/${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
 
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
   flyway:
@@ -20,3 +20,5 @@ app:
     expiration: 86400000 # 24 hours
   testdata:
     seed: 22
+  weights:
+    soft-features: 0.15

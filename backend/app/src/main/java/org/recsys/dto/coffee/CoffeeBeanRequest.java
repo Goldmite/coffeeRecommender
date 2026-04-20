@@ -31,6 +31,7 @@ public class CoffeeBeanRequest {
         private List<String> origins;
         private String process;
         private RoastLevel roastLevel;
+        private String description;
         private List<Integer> altitude;
         private Double scaScore;
         private Integer acidity;
