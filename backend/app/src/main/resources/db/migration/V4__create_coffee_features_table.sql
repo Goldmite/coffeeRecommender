@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS coffee_features (
     origins TEXT[],
     process TEXT,
     roast_level INTEGER NOT NULL DEFAULT 2, -- 2 is MEDIUM
-    description TEXT,
+    coffee_description TEXT,
     altitude INT4RANGE,
     sca_score DECIMAL(4, 2),
     acidity SMALLINT,

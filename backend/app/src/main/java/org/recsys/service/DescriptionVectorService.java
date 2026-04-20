@@ -4,6 +4,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.recsys.config.FeatureWeights;
 import org.recsys.repository.CoffeeRepository;
 
 import java.io.IOException;
@@ -26,11 +27,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DescriptionVectorService {
 
-    private static final List<String> VOCABULARY = Arrays.asList(
-            "chocolate", "berries", "nuts", "fruits", "citrus", "flowers", "caramel");
-    private static final float SOFT_FEATURE_WEIGHT = 0.15f;
-
     private final CoffeeRepository repository;
+    private final FeatureWeights settings;
+
+    private static final List<String> VOCABULARY = Arrays.asList(
+            "chocolate", "berries", "nuts", "fruits", "citrus",
+            "flowers", "caramel", "spices", "sweet", "herbal", "earthy");
+
     private final Map<String, Double> idfMap = new HashMap<>();
 
     @EventListener(ApplicationReadyEvent.class)
@@ -42,7 +45,7 @@ public class DescriptionVectorService {
         calculateGlobalIdf(descriptions);
     }
 
-    public Map<String, Double> calculateGlobalIdf(List<String> allDescriptions) {
+    private void calculateGlobalIdf(List<String> allDescriptions) {
         Map<String, Integer> df = new HashMap<>();
         int size = allDescriptions.size();
 
@@ -57,10 +60,9 @@ public class DescriptionVectorService {
             double idf = Math.log((double) size / (df.getOrDefault(term, 0) + 1)) + 1.0;
             idfMap.put(term, idf);
         }
-        return idfMap;
     }
 
-    public float[] getDescriptionTfIdfVector(String description, Map<String, Double> idfs) {
+    public float[] getDescriptionTfIdfVector(String description) {
         float[] vector = new float[VOCABULARY.size()];
 
         List<String> tokens = tokenize(description);
@@ -74,9 +76,9 @@ public class DescriptionVectorService {
             String term = VOCABULARY.get(i);
             if (termCounts.containsKey(term)) {
                 double tf = (double) termCounts.get(term) / tokens.size();
-                double idf = idfs.getOrDefault(term, 1.0);
+                double idf = idfMap.getOrDefault(term, 1.0);
 
-                vector[i] = (float) (tf * idf) * SOFT_FEATURE_WEIGHT;
+                vector[i] = (float) (tf * idf) * settings.softWeight();
             } else {
                 vector[i] = 0.0f;
             }

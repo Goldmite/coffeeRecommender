@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface CoffeeRepository extends JpaRepository<CoffeeBean, Long> {
 
-    @Query("SELECT description FROM coffee_beans")
+    @Query("SELECT f.description FROM CoffeeBean c JOIN c.features f")
     List<String> findAllDescriptions();
 }

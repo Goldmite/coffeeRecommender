@@ -3,6 +3,7 @@ package org.recsys.data;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,23 @@ public class CoffeeDataGenerator {
 
     private static final List<String> ORIGINS = List.of("Brazil", "Colombia", "Ethiopia", "Peru", "Kenya", "Nicaragua",
             "Guatemala", "Indonesia", "India");
+    // Flavor categories and pairings
+    private static final List<String> CATEGORIES = Arrays.asList(
+            "chocolate", "berries", "nuts", "fruits", "citrus",
+            "flowers", "caramel", "spices", "sweet", "herbal", "earthy");
+    private static final Map<String, List<String>> PAIRINGS = Map.ofEntries(
+            Map.entry("chocolate", Arrays.asList("nuts", "caramel", "spices", "earthy")),
+            Map.entry("berries", Arrays.asList("citrus", "flowers", "chocolate")),
+            Map.entry("nuts", Arrays.asList("chocolate", "caramel", "sweet")),
+            Map.entry("fruits", Arrays.asList("berries", "caramel", "sweet")),
+            Map.entry("citrus", Arrays.asList("flowers", "herbal", "berries")),
+            Map.entry("flowers", Arrays.asList("citrus", "berries", "sweet")),
+            Map.entry("caramel", Arrays.asList("nuts", "chocolate", "fruits", "spices")),
+            Map.entry("spices", Arrays.asList("chocolate", "earthy", "caramel")),
+            Map.entry("sweet", Arrays.asList("flowers", "nuts", "fruits")),
+            Map.entry("herbal", Arrays.asList("citrus", "flowers", "spices")),
+            Map.entry("earthy", Arrays.asList("spices", "chocolate", "nuts")));
+
     private static final List<String> PROCESSES = List.of("Washed", "Natural");
     // Mapping roast levels to a broad pool of flavor notes
     private static final Map<RoastLevel, List<String>> FLAVOR_MAP = Map.of(
@@ -40,6 +58,7 @@ public class CoffeeDataGenerator {
                 .origins(generateOrigins())
                 .process(pickRandom(PROCESSES))
                 .roastLevel(roast)
+                .description(generateDescription())
                 .altitude(generateAltitude())
                 .scaScore(generateScaScore())
                 .acidity(pickFromscaleOneToTen())
@@ -83,6 +102,20 @@ public class CoffeeDataGenerator {
         if (roll < 90)
             return RoastLevel.MEDIUM_DARK;
         return RoastLevel.DARK;
+    }
+
+    private String generateDescription() {
+        String[] templates = {
+                "A cup with distinct notes of %s and %s.",
+                "Expect a smooth body featuring %s, complemented by subtle %s undertones.",
+                "Rich and aromatic, this coffee highlights %s with a lingering finish of %s.",
+                "A complex profile showcasing %s and hints of %s."
+        };
+        String template = templates[random.nextInt(templates.length)];
+        String primary = CATEGORIES.get(random.nextInt(CATEGORIES.size()));
+        List<String> options = PAIRINGS.get(primary);
+        String secondary = options.get(random.nextInt(options.size()));
+        return String.format(template, primary, secondary);
     }
 
     private List<Integer> generateAltitude() {

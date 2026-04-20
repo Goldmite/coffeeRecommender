@@ -39,6 +39,7 @@ public class CoffeeFeatures {
     @Enumerated(EnumType.ORDINAL)
     private RoastLevel roastLevel;
 
+    @Column(name = "coffee_description")
     private String description;
 
     @Type(PostgreSQLRangeType.class)
