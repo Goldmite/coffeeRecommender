@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.recsys.dto.coffee.CoffeeBeanRequest;
+import org.recsys.model.Processing;
 import org.recsys.model.RoastLevel;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +41,6 @@ public class CoffeeDataGenerator {
             Map.entry("herbal", Arrays.asList("citrus", "flowers", "spices")),
             Map.entry("earthy", Arrays.asList("spices", "chocolate", "nuts")));
 
-    private static final List<String> PROCESSES = List.of("Washed", "Natural");
     // Mapping roast levels to a broad pool of flavor notes
     private static final Map<RoastLevel, List<String>> FLAVOR_MAP = Map.of(
             RoastLevel.LIGHT, List.of("Jasmine", "Bergamot", "Peach", "Earl Grey", "Lemon", "Green Apple", "Floral"),
@@ -56,7 +56,7 @@ public class CoffeeDataGenerator {
         // coffee features
         CoffeeBeanRequest.FeaturesRequest features = CoffeeBeanRequest.FeaturesRequest.builder()
                 .origins(generateOrigins())
-                .process(pickRandom(PROCESSES))
+                .process(pickRandom(List.of(Processing.values())))
                 .roastLevel(roast)
                 .description(generateDescription())
                 .altitude(generateAltitude())

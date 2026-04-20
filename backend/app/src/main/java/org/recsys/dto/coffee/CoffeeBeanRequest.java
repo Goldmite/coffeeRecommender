@@ -3,6 +3,7 @@ package org.recsys.dto.coffee;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.recsys.model.Processing;
 import org.recsys.model.RoastLevel;
 
 import lombok.AllArgsConstructor;
@@ -29,7 +30,7 @@ public class CoffeeBeanRequest {
     public static class FeaturesRequest {
 
         private List<String> origins;
-        private String process;
+        private Processing process;
         private RoastLevel roastLevel;
         private String description;
         private List<Integer> altitude;

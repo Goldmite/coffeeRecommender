@@ -34,7 +34,7 @@ public class CoffeeFeatures {
 
     @Column(columnDefinition = "text[]")
     private List<String> origins;
-    private String process;
+    private Processing process;
 
     @Enumerated(EnumType.ORDINAL)
     private RoastLevel roastLevel;
