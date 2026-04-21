@@ -21,4 +21,4 @@ app:
   testdata:
     seed: 22
   weights:
-    soft-features: 0.15
+    soft-features: 0.8
