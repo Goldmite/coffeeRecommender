@@ -5,7 +5,10 @@ import io.hypersistence.utils.hibernate.type.range.Range;
 
 import java.util.List;
 
+import org.hibernate.annotations.Array;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -96,6 +99,8 @@ public class CoffeeFeatures {
      * 29 - is "Sour";
      */
     @Column(columnDefinition = "vector(30)")
+    @JdbcTypeCode(SqlTypes.VECTOR)
+    @Array(length = 3)
     private float[] flavorVector;
 
     @OneToOne(fetch = FetchType.LAZY)
