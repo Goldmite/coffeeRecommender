@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS coffee_features (
     sweetness SMALLINT,
     bitterness SMALLINT,
     flavor_notes TEXT[],
-    flavor_vector VECTOR(100),
+    flavor_vector VECTOR(30),
 
     CONSTRAINT fk_coffee_bean_id FOREIGN KEY (coffee_id) REFERENCES coffee_beans(id) ON DELETE CASCADE
 );

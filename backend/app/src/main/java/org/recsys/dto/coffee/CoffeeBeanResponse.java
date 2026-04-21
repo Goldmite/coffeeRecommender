@@ -20,7 +20,7 @@ public class CoffeeBeanResponse {
     List<String> origins;
     Processing process;
     RoastLevel roastLevel;
-    // String description;
+    String description;
     List<Integer> altitude;
     Double scaScore;
     Integer acidity;
@@ -29,5 +29,5 @@ public class CoffeeBeanResponse {
     Integer sweetness;
     Integer bitterness;
     List<String> flavorNotes;
-    // float[] flavorVector;
+    float[] flavorVector;
 }

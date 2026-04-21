@@ -3,6 +3,7 @@ package org.recsys.service;
 import java.util.List;
 
 import org.recsys.dto.coffee.CoffeeBeanRequest;
+import org.recsys.dto.coffee.CoffeeVectorizationDto;
 import org.recsys.mapper.CoffeeMapper;
 import org.recsys.model.CoffeeBean;
 import org.recsys.repository.CoffeeRepository;
@@ -18,6 +19,7 @@ public class CoffeeService {
 
     private final CoffeeRepository coffeeRepository;
     private final CoffeeMapper mapper;
+    private final CoffeeVectorService vectorService;
 
     public CoffeeBean getCoffeeById(Long id) throws NotFoundException {
         return coffeeRepository.findById(id).orElseThrow(() -> new NotFoundException());
@@ -49,5 +51,17 @@ public class CoffeeService {
     @Transactional
     public void deleteCoffeeById(Long id) {
         coffeeRepository.deleteById(id);
+    }
+
+    @Transactional
+    public List<CoffeeBean> batchUpdateCoffeeVectors() {
+        List<CoffeeBean> all = coffeeRepository.findAll();
+
+        for (CoffeeBean coffee : all) {
+            CoffeeVectorizationDto dto = mapper.toVectorDto(coffee);
+            float[] vector = vectorService.createFlavorVector(dto);
+            coffee.getFeatures().setFlavorVector(vector);
+        }
+        return coffeeRepository.saveAll(all);
     }
 }

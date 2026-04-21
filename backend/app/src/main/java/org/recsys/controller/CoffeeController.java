@@ -56,4 +56,10 @@ public class CoffeeController {
         coffeeService.deleteCoffeeById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/vector")
+    public ResponseEntity<List<CoffeeBeanResponse>> batchUpdateCoffeeVectors() {
+        return ResponseEntity
+                .ok(coffeeService.batchUpdateCoffeeVectors().stream().map(bean -> mapper.toResponse(bean)).toList());
+    }
 }
