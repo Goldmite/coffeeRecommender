@@ -22,6 +22,7 @@ public class UserService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final UserPreferencesService preferencesService;
 
     private static final String INVALID_EMAIL_OR_PASSWORD = "Invalid email or password";
     private static final String USER_ALREADY_EXISTS = "User already exists";
@@ -49,7 +50,11 @@ public class UserService implements UserDetailsService {
         newUser.setEmail(request.getEmail());
         newUser.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 
-        return userRepository.save(newUser);
+        User user = userRepository.save(newUser);
+
+        preferencesService.setDefaultPreferencesForUser(user);
+
+        return user;
     }
 
     public User login(UserLoginRequest request) {
@@ -62,12 +67,4 @@ public class UserService implements UserDetailsService {
 
         return user;
     }
-
-    /*
-     * Add when needed and test it
-     * public User getUserById(Long id) {
-     * return userRepository.findById(id)
-     * .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND));
-     * }
-     */
 }

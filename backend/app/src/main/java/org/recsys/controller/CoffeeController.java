@@ -6,7 +6,9 @@ import org.recsys.dto.coffee.CoffeeBeanRequest;
 import org.recsys.dto.coffee.CoffeeBeanResponse;
 import org.recsys.dto.recommendation.CoffeeRecommendationResponse;
 import org.recsys.mapper.CoffeeMapper;
+import org.recsys.model.UserPreferences;
 import org.recsys.service.CoffeeService;
+import org.recsys.service.UserPreferencesService;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,7 @@ public class CoffeeController {
 
     private final CoffeeService coffeeService;
     private final CoffeeMapper mapper;
+    private final UserPreferencesService preferencesService;
 
     @GetMapping(params = "id")
     public ResponseEntity<CoffeeBeanResponse> getCoffeeById(@RequestParam Long id) throws NotFoundException {
@@ -64,12 +67,13 @@ public class CoffeeController {
                 .ok(coffeeService.batchUpdateCoffeeVectors().stream().map(bean -> mapper.toResponse(bean)).toList());
     }
 
-    // TODO: update to use userId with which to get user preferences vector as
-    // target
+    // TODO: move to different controller
     @GetMapping("/recommendations")
-    public ResponseEntity<List<CoffeeRecommendationResponse>> getTopNSimilarCoffees(@RequestParam Long id,
+    public ResponseEntity<List<CoffeeRecommendationResponse>> getTopNSimilarCoffees(@RequestParam Long userId,
             @RequestParam(defaultValue = "5") int n) throws NotFoundException {
-        float[] target = coffeeService.getCoffeeById(id).getFeatures().getFlavorVector();
+        UserPreferences pref = preferencesService.getUserPreferencesByUserId(userId)
+                .orElseThrow(() -> new NotFoundException());
+        float[] target = pref.getTasteProfile();
         return ResponseEntity
                 .ok(coffeeService.getSimilarCoffees(target, n));
     }

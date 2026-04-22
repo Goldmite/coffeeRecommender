@@ -6,8 +6,10 @@ import java.util.List;
 
 import org.recsys.dto.coffee.CoffeeVectorizationDto;
 import org.recsys.model.Processing;
+import org.recsys.model.RoastLevel;
 import org.springframework.stereotype.Service;
 
+import io.hypersistence.utils.hibernate.type.range.Range;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -19,15 +21,18 @@ public class CoffeeVectorService {
     private static final List<String> ORIGINS = List.of("Brazil", "Colombia", "Ethiopia", "Peru", "Kenya", "Nicaragua",
             "Guatemala", "Indonesia", "India", "Other");
 
-    // normalize using min max to range [0, 1]
-    private float normalize(double x, double min, double max) {
-        if (Double.compare(min, max) == 0) {
-            return 0.5f;
-        }
-        // min-max with range [0, 1]: (x - min) / (max - min)
-        double normalized = (x - min) / (max - min);
-        normalized = Math.max(0, Math.min(1, normalized)); // precaution for out of bounds
-        return (float) normalized;
+    public float[] createBaseVector() {
+        CoffeeVectorizationDto defaultDto = CoffeeVectorizationDto.builder()
+                .process(Processing.NATURAL.getProcess())
+                .roastLevel(RoastLevel.MEDIUM.ordinal())
+                .altitude(Range.closed(1000, 2500))
+                .acidity(5)
+                .body(5)
+                .aftertaste(5)
+                .sweetness(5)
+                .bitterness(5)
+                .build();
+        return createFlavorVector(defaultDto);
     }
 
     public float[] createFlavorVector(CoffeeVectorizationDto dto) {
@@ -44,7 +49,7 @@ public class CoffeeVectorService {
     }
 
     private float[] normalizeSimpleAttributes(CoffeeVectorizationDto dto) {
-        float nRoast = normalize(dto.getRoastLevel(), 1, 5);
+        float nRoast = normalize(dto.getRoastLevel(), 0, 4);
         float nAltitude = normalize((dto.getAltitude().lower() + dto.getAltitude().upper()) / 2.0f, 1000, 2501);
         float nScaScore = normalize(dto.getScaScore(), 80, 100);
         float nAcidity = normalize(dto.getAcidity(), 1, 10);
@@ -57,6 +62,17 @@ public class CoffeeVectorService {
 
         return new float[] { nRoast, nAltitude, nScaScore, nAcidity, nBody, nAftertaste, nSweetness, nBitterness,
                 singleOrigin };
+    }
+
+    // normalize using min max to range [0, 1]
+    private float normalize(double x, double min, double max) {
+        if (Double.compare(min, max) == 0) {
+            return 0.5f;
+        }
+        // min-max with range [0, 1]: (x - min) / (max - min)
+        double normalized = (x - min) / (max - min);
+        normalized = Math.max(0, Math.min(1, normalized)); // precaution for out of bounds
+        return (float) normalized;
     }
 
     private float[] multiHotEncode(List<String> values, List<String> allValues) {

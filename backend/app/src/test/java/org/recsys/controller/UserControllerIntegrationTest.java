@@ -11,6 +11,7 @@ import org.recsys.config.TestConfig;
 import org.recsys.dto.user.UserLoginRequest;
 import org.recsys.dto.user.UserSignupRequest;
 import org.recsys.model.User;
+import org.recsys.repository.UserPreferencesRepository;
 import org.recsys.repository.UserRepository;
 import org.recsys.testutil.TestDataFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,9 @@ class UserControllerIntegrationTest {
     private UserRepository userRepository;
 
     @Autowired
+    private UserPreferencesRepository preferencesRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -46,6 +50,7 @@ class UserControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        preferencesRepository.deleteAll();
         userRepository.deleteAll();
     }
 
