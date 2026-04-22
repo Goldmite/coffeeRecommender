@@ -1,9 +1,14 @@
 package org.recsys.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.recsys.dto.coffee.CoffeeBeanRequest;
+import org.recsys.dto.coffee.CoffeeBeanResponse;
 import org.recsys.dto.coffee.CoffeeVectorizationDto;
+import org.recsys.dto.recommendation.CoffeeCandidate;
+import org.recsys.dto.recommendation.CoffeeRecommendationResponse;
 import org.recsys.mapper.CoffeeMapper;
 import org.recsys.model.CoffeeBean;
 import org.recsys.repository.CoffeeRepository;
@@ -63,5 +68,21 @@ public class CoffeeService {
             coffee.getFeatures().setFlavorVector(vector);
         }
         return coffeeRepository.saveAll(all);
+    }
+
+    public List<CoffeeRecommendationResponse> getSimilarCoffees(float[] target, int n) {
+        List<CoffeeCandidate> candidates = coffeeRepository.findTopSimilarCoffeeCandidates(target, n);
+        // TODO: later just return candidates since this wont be passed to response from
+        // here. Remove from here and keep one in rec service
+        List<Long> candidateIds = candidates.stream().map(CoffeeCandidate::getId).toList();
+        List<CoffeeBean> beans = coffeeRepository.findAllById(candidateIds);
+        Map<Long, CoffeeBeanResponse> beanMap = beans.stream()
+                .collect(Collectors.toMap(CoffeeBean::getId, b -> mapper.toResponse(b)));
+
+        return candidates.stream()
+                .map(c -> new CoffeeRecommendationResponse(
+                        beanMap.get(c.getId()),
+                        c.getSimilarityScore()))
+                .toList();
     }
 }

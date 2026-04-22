@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.recsys.dto.coffee.CoffeeBeanRequest;
 import org.recsys.dto.coffee.CoffeeBeanResponse;
+import org.recsys.dto.recommendation.CoffeeRecommendationResponse;
 import org.recsys.mapper.CoffeeMapper;
 import org.recsys.service.CoffeeService;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
@@ -61,5 +62,15 @@ public class CoffeeController {
     public ResponseEntity<List<CoffeeBeanResponse>> batchUpdateCoffeeVectors() {
         return ResponseEntity
                 .ok(coffeeService.batchUpdateCoffeeVectors().stream().map(bean -> mapper.toResponse(bean)).toList());
+    }
+
+    // TODO: update to use userId with which to get user preferences vector as
+    // target
+    @GetMapping("/recommendations")
+    public ResponseEntity<List<CoffeeRecommendationResponse>> getTopNSimilarCoffees(@RequestParam Long id,
+            @RequestParam(defaultValue = "5") int n) throws NotFoundException {
+        float[] target = coffeeService.getCoffeeById(id).getFeatures().getFlavorVector();
+        return ResponseEntity
+                .ok(coffeeService.getSimilarCoffees(target, n));
     }
 }
