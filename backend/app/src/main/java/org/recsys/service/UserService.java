@@ -1,8 +1,13 @@
 package org.recsys.service;
 
+import java.util.Optional;
+
 import org.recsys.dto.user.UserLoginRequest;
 import org.recsys.dto.user.UserSignupRequest;
+import org.recsys.model.ExperienceLevel;
 import org.recsys.model.User;
+import org.recsys.model.UserPreferences;
+import org.recsys.repository.UserPreferencesRepository;
 import org.recsys.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +27,8 @@ public class UserService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final UserPreferencesRepository preferencesRepository;
+    private final CoffeeVectorService vectorService;
 
     private static final String INVALID_EMAIL_OR_PASSWORD = "Invalid email or password";
     private static final String USER_ALREADY_EXISTS = "User already exists";
@@ -49,7 +56,22 @@ public class UserService implements UserDetailsService {
         newUser.setEmail(request.getEmail());
         newUser.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 
-        return userRepository.save(newUser);
+        User user = userRepository.save(newUser);
+
+        setDefaultPreferencesForUser(user);
+
+        return user;
+    }
+
+    public UserPreferences setDefaultPreferencesForUser(User user) {
+        UserPreferences preferences = UserPreferences.builder()
+                .user(user)
+                .experienceLevel(ExperienceLevel.BEGINNER)
+                .prepMethod(null)
+                .tasteProfile(vectorService.createBaseVector())
+                .build();
+
+        return preferencesRepository.save(preferences);
     }
 
     public User login(UserLoginRequest request) {
@@ -61,6 +83,10 @@ public class UserService implements UserDetailsService {
         }
 
         return user;
+    }
+
+    public Optional<UserPreferences> getUserPreferencesByUserId(Long userId) {
+        return preferencesRepository.findById(userId);
     }
 
     /*
