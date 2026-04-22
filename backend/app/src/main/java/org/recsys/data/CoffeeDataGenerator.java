@@ -52,10 +52,10 @@ public class CoffeeDataGenerator {
     public CoffeeBeanRequest generate(int index) {
         String coffeeNr = String.format("%04d", index);
         RoastLevel roast = generateRoast();
-        List<String> origin = generateOrigins();
+        List<String> origins = generateOrigins();
         // coffee features
         CoffeeBeanRequest.FeaturesRequest features = CoffeeBeanRequest.FeaturesRequest.builder()
-                .origins(generateOrigins())
+                .origins(origins)
                 .process(pickRandom(List.of(Processing.values())))
                 .roastLevel(roast)
                 .description(generateDescription())
@@ -70,7 +70,7 @@ public class CoffeeDataGenerator {
                 .build();
         // coffee bean
         return CoffeeBeanRequest.builder()
-                .name(origin.getFirst() + " Coffee #" + coffeeNr)
+                .name(origins.getFirst() + " Coffee #" + coffeeNr)
                 .price(BigDecimal.valueOf(15.0 + (random.nextDouble() * 20.0)).setScale(2, RoundingMode.HALF_UP))
                 .productUrl("https://example.com/coffee/" + coffeeNr)
                 .shopId(random.nextInt(5) + 1)
