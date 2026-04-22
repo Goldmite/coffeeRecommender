@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS user_interactions (
     is_clicked BOOLEAN,
     is_purchased BOOLEAN,
     created_at TIMESTAMPTZ NOT NULL,
-    updated_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL
 );
