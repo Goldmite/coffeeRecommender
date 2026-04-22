@@ -11,6 +11,10 @@ public class TestDataFactory {
     public static String testEmail = "john.pork@test.com";
     public static String testPassword = "AS()*J#M@IHAKa40k";
 
+    public static User createUser() {
+        return createUser(testName, testEmail, testPassword);
+    }
+
     public static User createUser(String email, String pw_hash) {
         return createUser(testName, email, pw_hash);
     }

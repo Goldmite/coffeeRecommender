@@ -1,7 +1,9 @@
 package org.recsys.service;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +42,7 @@ class CoffeeVectorServiceTest {
                 .coffeeId(1L)
                 .origins(List.of("Ethiopia"))
                 .process("WASHED")
-                .roastLevel(3)
+                .roastLevel(2) // MEDIUM
                 .description("A floral and fruity coffee")
                 .altitude(Range.closed(1000, 2500))
                 .scaScore(90.0)
@@ -128,5 +130,15 @@ class CoffeeVectorServiceTest {
                 assertEquals(0.0f, result[i]);
             }
         });
+    }
+
+    @Test
+    void createBaseVector_ShouldBeConsistent() {
+        // given
+        float[] firstCall = coffeeVectorService.createBaseVector();
+        float[] secondCall = coffeeVectorService.createBaseVector();
+        // then
+        assertTrue(firstCall.length > 0);
+        assertArrayEquals(firstCall, secondCall, "Base vector should be deterministic");
     }
 }
