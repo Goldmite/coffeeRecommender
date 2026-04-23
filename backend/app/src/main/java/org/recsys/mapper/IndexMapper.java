@@ -15,4 +15,8 @@ public class IndexMapper {
             return idx;
         });
     }
+
+    public int getSize() {
+        return internalToExternal.size();
+    }
 }
