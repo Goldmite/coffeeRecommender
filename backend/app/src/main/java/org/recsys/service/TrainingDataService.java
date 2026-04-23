@@ -56,9 +56,9 @@ public class TrainingDataService {
         if (ui.getRating() != null && ui.getRating() > 0)
             return ui.getRating().floatValue();
         if (ui.getIsPurchased())
-            return 5.0f;
+            return 3.0f;
         if (ui.getIsClicked())
-            return 2.0f;
+            return 1.7f;
         return 0.0f;
     }
 }

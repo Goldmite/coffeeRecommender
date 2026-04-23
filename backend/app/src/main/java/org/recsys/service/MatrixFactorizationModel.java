@@ -3,17 +3,28 @@ package org.recsys.service;
 import java.util.List;
 import java.util.Random;
 
+import org.recsys.config.MatrixFactorizationConfig;
 import org.recsys.dto.recommendation.PreparedTrainingData;
 import org.recsys.dto.recommendation.RatingTriplet;
 import org.recsys.dto.recommendation.TrainedModel;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class MatrixFactorizationModel {
+
+    private final MatrixFactorizationConfig config;
+
+    public TrainedModel train(PreparedTrainingData data) {
+        return train(data, config.getLearningRate(), config.getRegularization(), config.getLatentFactors(),
+                config.getEpochs());
+    }
 
     public TrainedModel train(PreparedTrainingData data, float learningRate, float regularization, int K, int epochs) {
         int userAmount = data.userMapper().getSize();
-        int coffeeAmount = data.userMapper().getSize();
+        int coffeeAmount = data.coffeeMapper().getSize();
         float mean = data.globalMean();
         List<RatingTriplet> triplets = data.triplets();
 
@@ -36,7 +47,6 @@ public class MatrixFactorizationModel {
                 int i = triplet.coffeeIndex();
                 int uOffset = u * K;
                 int iOffset = i * K;
-
                 float dotProcuct = 0; // Pu · Qi
                 for (int k = 0; k < K; k++) {
                     dotProcuct += userFactors[uOffset + k] * coffeeFactors[iOffset + k];
