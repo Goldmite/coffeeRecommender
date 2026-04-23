@@ -10,10 +10,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @Getter
+@SuperBuilder
+@NoArgsConstructor
 public abstract class AuditEntity {
 
     @CreatedDate

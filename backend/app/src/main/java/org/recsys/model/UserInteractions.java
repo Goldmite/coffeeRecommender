@@ -21,6 +21,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "user_interactions")
@@ -29,7 +30,7 @@ import lombok.ToString;
 @Setter
 @ToString(exclude = { "user", "coffeeBean" })
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @DynamicUpdate
 public class UserInteractions extends AuditEntity {
 

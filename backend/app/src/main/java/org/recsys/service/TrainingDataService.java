@@ -36,7 +36,7 @@ public class TrainingDataService {
             // 1. Get/Create indices
             int uIdx = userMapper.getInternalIndex(ui.getUserId());
             int iIdx = itemMapper.getInternalIndex(ui.getCoffeeId());
-            // 2. Determine the score based on your hierarchy
+            // 2. Determine the score
             float score = calculateScore(ui);
             totalRatingSum += score;
             // 3. Add to the list
