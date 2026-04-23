@@ -20,7 +20,7 @@ public class TestDataFactory {
     }
 
     public static User createUser(String name, String email, String pw_hash) {
-        return new User(1L, name, email, pw_hash, UserRole.USER);
+        return new User(null, name, email, pw_hash, UserRole.USER);
     }
 
     public static UserSignupRequest validSignup() {
