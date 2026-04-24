@@ -14,7 +14,7 @@ public interface TrainedModelRepository extends JpaRepository<TrainedModelArtifa
     @Query("SELECT COALESCE(MAX(version), 0) FROM TrainedModelArtifact")
     int findMaxVersion();
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE TrainedModelArtifact SET isActive = false WHERE isActive = true")
     void deactivateOldModels();
 }

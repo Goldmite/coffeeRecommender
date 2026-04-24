@@ -1,4 +1,4 @@
-CREATE IF NOT EXISTS trained_models (
+CREATE TABLE IF NOT EXISTS trained_models (
     id SERIAL PRIMARY KEY,
     version INT NOT NULL,
     model_data BYTEA NOT NULL,

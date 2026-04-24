@@ -1,0 +1,19 @@
+edition = "2024";
+
+package org.recsys.proto;
+
+option java_outer_classname = "ModelProtos";
+
+message TrainedModelProto {
+    
+    repeated float user_factors = 1;
+    repeated float coffee_factors = 2;
+    repeated float user_biases = 3;
+    repeated float coffee_biases = 4;
+    
+    int32 k = 5;
+    float global_mean = 6;
+    
+    map<int64, int32> user_id_to_idx = 7;
+    map<int64, int32> coffee_id_to_idx = 8;
+}

@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.recsys.dto.recommendation.TrainedModel;
 import org.recsys.repository.TrainedModelRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.util.SerializationUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

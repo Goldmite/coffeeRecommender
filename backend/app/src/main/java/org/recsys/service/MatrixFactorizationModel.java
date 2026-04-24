@@ -12,7 +12,6 @@ import org.recsys.model.ModelMetadata;
 import org.recsys.model.TrainedModelArtifact;
 import org.recsys.repository.TrainedModelRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.util.SerializationUtils;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -97,7 +96,7 @@ public class MatrixFactorizationModel {
         TrainedModel model = result.model();
 
         ModelMetadata metadata = ModelMetadata.builder()
-                .k(config.getLatentFactors())
+                .k(model.K())
                 .gamma(config.getLearningRate())
                 .lambda(config.getRegularization())
                 .epochs(config.getEpochs())
@@ -105,7 +104,7 @@ public class MatrixFactorizationModel {
                 .coffeeCount(model.coffeeMapper().getSize())
                 .build();
 
-        byte[] serializedModel = TrainedModel.serialize(model);
+        byte[] serializedModel = model.serialize();
         TrainedModelArtifact artifact = TrainedModelArtifact.builder()
                 .version(repository.findMaxVersion() + 1)
                 .data(serializedModel)

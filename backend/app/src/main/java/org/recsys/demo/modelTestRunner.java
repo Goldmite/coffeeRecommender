@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 
 @Component
-@Profile("test")
+@Profile("demo")
 @RequiredArgsConstructor
 public class modelTestRunner implements CommandLineRunner {
 
