@@ -43,7 +43,6 @@ public class MatrixFactorizationModel {
         float[] userAlphas = new float[userAmount];
         int binAmount = 6; // 2 years / 4 months
         float[] coffeeBinBiases = new float[coffeeAmount * binAmount];
-        float[] devs = data.temporal().deviations();
         long binPeriodSeconds = 10368000; // ~ 4 months
 
         Random rand = new Random();
@@ -63,7 +62,7 @@ public class MatrixFactorizationModel {
                 int uOffset = u * K;
                 int iOffset = i * K;
                 // coffee periodical bins (discrete)
-                int binIdx = (int) ((triplet.timestamp() - data.temporal().minTimestamp()) / binPeriodSeconds);
+                int binIdx = (int) ((triplet.timestamp() - data.minTimestamp()) / binPeriodSeconds);
                 binIdx = Math.min(binIdx, binAmount - 1); // cap at most recent period
                 int bOffset = i * binAmount + binIdx;
 
@@ -72,7 +71,7 @@ public class MatrixFactorizationModel {
                     dotProduct += userFactors[uOffset + k] * coffeeFactors[iOffset + k];
                 }
                 // PREDICTION (Score): Rui = μ + Bu(t) + (Bi + Bi_bin) + (Pu · Qi)
-                float prediction = mean + userBiasT(userBiases[u], userAlphas[u], devs[u])
+                float prediction = mean + (userBiases[u] + userAlphas[u] * triplet.dev())
                         + (coffeeBiases[i] + coffeeBinBiases[bOffset]) + dotProduct;
 
                 float error = triplet.score() - prediction;
@@ -84,7 +83,7 @@ public class MatrixFactorizationModel {
                 coffeeBiases[i] += learningRate * (error - regularization * coffeeBiases[i]);
                 // update temporal data
                 // Au += gamma * (e * devU(t) - lambda * Au)
-                userAlphas[u] += learningRate * (error * devs[u] - regularization * userAlphas[u]);
+                userAlphas[u] += learningRate * (error * triplet.dev() - regularization * userAlphas[u]);
                 // Bi_bin += gamma * (e - lamdba * Bi_bin)
                 coffeeBinBiases[i] += learningRate * (error - regularization * coffeeBinBiases[i]);
                 // update latent factors
@@ -132,9 +131,5 @@ public class MatrixFactorizationModel {
                 .metadata(metadata)
                 .build();
         repository.save(artifact);
-    }
-
-    private float userBiasT(float Bu, float alpha, float devT) {
-        return Bu + alpha * devT;
     }
 }

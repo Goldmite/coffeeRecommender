@@ -9,7 +9,6 @@ import java.util.Map;
 import org.recsys.config.MatrixFactorizationConfig;
 import org.recsys.dto.recommendation.PreparedTrainingData;
 import org.recsys.dto.recommendation.RatingTriplet;
-import org.recsys.dto.recommendation.TemporalData;
 import org.recsys.mapper.IndexMapper;
 import org.recsys.model.UserInteractions;
 import org.recsys.repository.UserInteractionsRepository;
@@ -34,7 +33,6 @@ public class TrainingDataService {
         IndexMapper userMapper = new IndexMapper();
         IndexMapper coffeeMapper = new IndexMapper();
         List<RatingTriplet> triplets = new ArrayList<>();
-        int userAmount = userMapper.getSize();
 
         Map<Integer, Double> userTimeSums = new HashMap<>();
         Map<Integer, Integer> userCounts = new HashMap<>();
@@ -45,10 +43,6 @@ public class TrainingDataService {
         for (UserInteractions ui : interactions) {
             // 1. Get/Create indices
             int uIdx = userMapper.getInternalIndex(ui.getUserId());
-            int iIdx = coffeeMapper.getInternalIndex(ui.getCoffeeId());
-            // 2. Determine the score
-            float score = calculateScore(ui);
-            totalRatingSum += score;
             // 3. Prepare time mean data
             long timestamp = ui.getCreatedAt().getEpochSecond();
             if (timestamp < minTimestamp)
@@ -56,31 +50,35 @@ public class TrainingDataService {
 
             userTimeSums.put(uIdx, userTimeSums.getOrDefault(uIdx, 0.0) + timestamp);
             userCounts.put(uIdx, userCounts.getOrDefault(uIdx, 0) + 1);
-            // 4. Add to the list
-            triplets.add(new RatingTriplet(uIdx, iIdx, score, timestamp));
         }
 
+        int userAmount = userMapper.getSize();
         float[] userTimestampMeans = new float[userAmount];
         for (int u = 0; u < userAmount; u++) {
             userTimestampMeans[u] = (float) (userTimeSums.get(u) / userCounts.get(u));
         }
 
-        float globalMean = triplets.isEmpty() ? 0 : (float) (totalRatingSum / triplets.size());
-        // precalculate deviation before training epochs
-        float deviations[] = new float[userAmount];
+        // add triplets with precalculated dev
         for (UserInteractions ui : interactions) {
             int uIdx = userMapper.getInternalIndex(ui.getUserId());
+            int iIdx = coffeeMapper.getInternalIndex(ui.getCoffeeId());
             long t = ui.getCreatedAt().getEpochSecond();
             // User deviation over time (continuous)
-            float timeDiff = t - userTimestampMeans[uIdx];
-            deviations[uIdx] = (float) (Math.signum(timeDiff) * Math.pow(Math.abs(timeDiff), config.getBeta()));
+            float timeDiff = (t - userTimestampMeans[uIdx]) / 86400.0f; // days
+            float dev = (float) (Math.signum(timeDiff) * Math.pow(Math.abs(timeDiff), config.getBeta()));
+            // Determine the score
+            float score = calculateScore(ui);
+            totalRatingSum += score;
+
+            triplets.add(new RatingTriplet(uIdx, iIdx, score, t, dev));
         }
+
+        float globalMean = triplets.isEmpty() ? 0 : (float) (totalRatingSum / triplets.size());
 
         if (shuffled)
             Collections.shuffle(triplets);
 
-        return new PreparedTrainingData(triplets, userMapper, coffeeMapper, globalMean,
-                new TemporalData(minTimestamp, deviations));
+        return new PreparedTrainingData(triplets, userMapper, coffeeMapper, globalMean, minTimestamp);
     }
 
     private float calculateScore(UserInteractions ui) {

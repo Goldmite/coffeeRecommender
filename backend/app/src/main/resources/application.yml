@@ -29,3 +29,4 @@ recommendation:
     learning-rate: 0.015
     regularization: 0.02
     epochs: 100
+    beta: 0.4
