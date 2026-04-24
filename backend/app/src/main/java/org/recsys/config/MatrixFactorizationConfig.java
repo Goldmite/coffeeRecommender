@@ -34,4 +34,9 @@ public class MatrixFactorizationConfig {
      * Number of training passes over the entire dataset.
      */
     private int epochs = 70;
+
+    /**
+     * A constant power to control stretch of time
+     */
+    private double beta = 0.4;
 }

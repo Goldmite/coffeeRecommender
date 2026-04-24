@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.recsys.config.MatrixFactorizationConfig;
 import org.recsys.dto.recommendation.PreparedTrainingData;
 import org.recsys.dto.recommendation.RatingTriplet;
 import org.recsys.model.UserInteractions;
@@ -24,6 +25,9 @@ class TrainingDataServiceTest {
 
     @Mock
     private UserInteractionsRepository interactionRepository;
+
+    @Mock
+    private MatrixFactorizationConfig config;
 
     @InjectMocks
     private TrainingDataService trainingDataService;

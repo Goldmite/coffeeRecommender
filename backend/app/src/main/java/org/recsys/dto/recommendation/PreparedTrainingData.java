@@ -8,5 +8,6 @@ public record PreparedTrainingData(
                 List<RatingTriplet> triplets,
                 IndexMapper userMapper,
                 IndexMapper coffeeMapper,
-                float globalMean) {
+                float globalMean,
+                long minTimestamp) {
 }

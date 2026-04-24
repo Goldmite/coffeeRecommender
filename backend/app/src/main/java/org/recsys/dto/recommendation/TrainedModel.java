@@ -13,6 +13,8 @@ public record TrainedModel(
         float[] coffeeFactors,
         float[] userBiases,
         float[] coffeeBiases,
+        float[] userAlphas,
+        float[] coffeeBinBiases,
         int K,
         float globalMean,
         IndexMapper userMapper,
@@ -41,6 +43,8 @@ public record TrainedModel(
                 .addAllCoffeeFactors(floatArrayToList(coffeeFactors))
                 .addAllUserBiases(floatArrayToList(userBiases))
                 .addAllCoffeeBiases(floatArrayToList(coffeeBiases))
+                .addAllUserAlphas(floatArrayToList(userAlphas))
+                .addAllCoffeeBinBiases(floatArrayToList(coffeeBinBiases))
                 .setK(K)
                 .setGlobalMean(globalMean)
                 .putAllUserIdToIdx(userMapper.getInternalMap())
@@ -57,6 +61,8 @@ public record TrainedModel(
                 listToFloatArray(proto.getCoffeeFactorsList()),
                 listToFloatArray(proto.getUserBiasesList()),
                 listToFloatArray(proto.getCoffeeBiasesList()),
+                listToFloatArray(proto.getUserAlphasList()),
+                listToFloatArray(proto.getCoffeeBinBiasesList()),
                 proto.getK(),
                 proto.getGlobalMean(),
                 new IndexMapper(proto.getUserIdToIdxMap()),

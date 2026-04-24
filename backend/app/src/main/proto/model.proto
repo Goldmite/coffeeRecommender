@@ -10,10 +10,12 @@ message TrainedModelProto {
     repeated float coffee_factors = 2;
     repeated float user_biases = 3;
     repeated float coffee_biases = 4;
+    repeated float user_alphas = 5;
+    repeated float coffee_bin_biases = 6;
     
-    int32 k = 5;
-    float global_mean = 6;
+    int32 k = 7;
+    float global_mean = 8;
     
-    map<int64, int32> user_id_to_idx = 7;
-    map<int64, int32> coffee_id_to_idx = 8;
+    map<int64, int32> user_id_to_idx = 9;
+    map<int64, int32> coffee_id_to_idx = 10;
 }
