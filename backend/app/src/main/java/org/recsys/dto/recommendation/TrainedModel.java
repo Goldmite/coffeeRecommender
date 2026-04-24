@@ -1,5 +1,7 @@
 package org.recsys.dto.recommendation;
 
+import java.io.Serializable;
+
 import org.recsys.mapper.IndexMapper;
 
 public record TrainedModel(
@@ -8,10 +10,11 @@ public record TrainedModel(
         float[] userBiases,
         float[] coffeeBiases,
         int K,
+        float globalMean,
         IndexMapper userMapper,
-        IndexMapper coffeeMapper) {
+        IndexMapper coffeeMapper) implements Serializable {
 
-    public float predict(Long userId, Long coffeeId, float globalMean) {
+    public float predict(Long userId, Long coffeeId) {
         Integer u = userMapper.getInternalIndex(userId);
         Integer i = coffeeMapper.getInternalIndex(coffeeId);
         // fallback

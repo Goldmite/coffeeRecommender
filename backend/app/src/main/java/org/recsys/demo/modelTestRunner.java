@@ -2,6 +2,7 @@ package org.recsys.demo;
 
 import org.recsys.dto.recommendation.PreparedTrainingData;
 import org.recsys.dto.recommendation.TrainedModel;
+import org.recsys.dto.recommendation.TrainingResult;
 import org.recsys.service.MatrixFactorizationModel;
 import org.recsys.service.TrainingDataService;
 import org.springframework.boot.CommandLineRunner;
@@ -34,12 +35,14 @@ public class modelTestRunner implements CommandLineRunner {
         System.out.println("🌍 Global Mean Rating: " + data.globalMean());
 
         // 2. Run the training
-        TrainedModel model = modelService.train(data);
+        TrainingResult result = modelService.train(data);
+        TrainedModel model = result.model();
+        System.out.println("Final RMSE: " + result.rmse());
 
         System.out.println("✅ Training Complete!");
 
         // 3. Test a dummy prediction
-        float predicted = model.predict(1L, 1L, data.globalMean());
+        float predicted = model.predict(1L, 1L);
         System.out.println("🔮 Prediction for User 1 on Coffee 1: " + predicted);
     }
 }

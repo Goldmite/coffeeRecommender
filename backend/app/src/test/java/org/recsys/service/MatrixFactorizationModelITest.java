@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.recsys.config.TestConfig;
 import org.recsys.dto.recommendation.PreparedTrainingData;
 import org.recsys.dto.recommendation.TrainedModel;
+import org.recsys.dto.recommendation.TrainingResult;
 import org.recsys.model.CoffeeBean;
 import org.recsys.model.User;
 import org.recsys.model.UserInteractions;
@@ -71,11 +72,12 @@ class MatrixFactorizationModelITest {
         PreparedTrainingData data = trainingDataService.prepareData(true);
         // 2. Act: Train with enough epochs to allow convergence
         // We use a slightly higher epoch count (100) to ensure the error drops
-        TrainedModel model = mfModel.train(data, 0.02f, 0.02f, 25, 50);
+        TrainingResult result = mfModel.train(data, 0.02f, 0.02f, 25, 50);
+        TrainedModel model = result.model();
         // 3. Assert: Verify the predictions reflect the training data
-        float predictionLike = model.predict(savedUser1.getId(), 10L, data.globalMean());
-        float predictionDislike = model.predict(savedUser1.getId(), 20L, data.globalMean());
-        float predictionUser2 = model.predict(savedUser2.getId(), 20L, data.globalMean());
+        float predictionLike = model.predict(savedUser1.getId(), 10L);
+        float predictionDislike = model.predict(savedUser1.getId(), 20L);
+        float predictionUser2 = model.predict(savedUser2.getId(), 20L);
         // User 1's prediction for Coffee 10 should be significantly higher than for
         // Coffee 20
         assertTrue(predictionLike > predictionDislike,

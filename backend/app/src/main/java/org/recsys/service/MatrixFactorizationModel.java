@@ -7,8 +7,14 @@ import org.recsys.config.MatrixFactorizationConfig;
 import org.recsys.dto.recommendation.PreparedTrainingData;
 import org.recsys.dto.recommendation.RatingTriplet;
 import org.recsys.dto.recommendation.TrainedModel;
+import org.recsys.dto.recommendation.TrainingResult;
+import org.recsys.model.ModelMetadata;
+import org.recsys.model.TrainedModelArtifact;
+import org.recsys.repository.TrainedModelRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.util.SerializationUtils;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -16,13 +22,15 @@ import lombok.RequiredArgsConstructor;
 public class MatrixFactorizationModel {
 
     private final MatrixFactorizationConfig config;
+    private final TrainedModelRepository repository;
 
-    public TrainedModel train(PreparedTrainingData data) {
+    public TrainingResult train(PreparedTrainingData data) {
         return train(data, config.getLearningRate(), config.getRegularization(), config.getLatentFactors(),
                 config.getEpochs());
     }
 
-    public TrainedModel train(PreparedTrainingData data, float learningRate, float regularization, int K, int epochs) {
+    public TrainingResult train(PreparedTrainingData data, float learningRate, float regularization, int K,
+            int epochs) {
         int userAmount = data.userMapper().getSize();
         int coffeeAmount = data.coffeeMapper().getSize();
         float mean = data.globalMean();
@@ -38,6 +46,8 @@ public class MatrixFactorizationModel {
             userFactors[i] = (float) (rand.nextGaussian() * 0.1);
         for (int i = 0; i < coffeeFactors.length; i++)
             coffeeFactors[i] = (float) (rand.nextGaussian() * 0.1);
+
+        double rmse = 0;
 
         for (int epoch = 0; epoch < epochs; epoch++) {
             double totalError = 0;
@@ -71,10 +81,38 @@ public class MatrixFactorizationModel {
                 }
             }
             // root mean square error
-            double rmse = Math.sqrt(totalError / triplets.size());
+            rmse = Math.sqrt(totalError / triplets.size());
             System.out.printf("Epoch %d/%d - RMSE: %.4f%n", epoch + 1, epochs, rmse);
         }
-        return new TrainedModel(userFactors, coffeeFactors, userBiases, coffeeBiases, K, data.userMapper(),
+        TrainedModel model = new TrainedModel(userFactors, coffeeFactors, userBiases, coffeeBiases, K, mean,
+                data.userMapper(),
                 data.coffeeMapper());
+        return new TrainingResult(model, rmse);
+    }
+
+    @Transactional
+    public void saveModel(TrainingResult result) {
+        repository.deactivateOldModels();
+
+        TrainedModel model = result.model();
+
+        ModelMetadata metadata = ModelMetadata.builder()
+                .k(config.getLatentFactors())
+                .gamma(config.getLearningRate())
+                .lambda(config.getRegularization())
+                .epochs(config.getEpochs())
+                .userCount(model.userMapper().getSize())
+                .coffeeCount(model.coffeeMapper().getSize())
+                .build();
+
+        byte[] serializedModel = TrainedModel.serialize(model);
+        TrainedModelArtifact artifact = TrainedModelArtifact.builder()
+                .version(repository.findMaxVersion() + 1)
+                .data(serializedModel)
+                .rmse(result.rmse())
+                .isActive(true)
+                .metadata(metadata)
+                .build();
+        repository.save(artifact);
     }
 }
