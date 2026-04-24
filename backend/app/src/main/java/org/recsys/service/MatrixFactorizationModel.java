@@ -33,12 +33,14 @@ public class MatrixFactorizationModel {
         int userAmount = data.userMapper().getSize();
         int coffeeAmount = data.coffeeMapper().getSize();
         float mean = data.globalMean();
+        float[] userMeanTimestamps = data.userMeanTimestamps();
         List<RatingTriplet> triplets = data.triplets();
 
         float[] userFactors = new float[userAmount * K];
         float[] coffeeFactors = new float[coffeeAmount * K];
         float[] userBiases = new float[userAmount];
         float[] coffeeBiases = new float[coffeeAmount];
+        float[] userAlphas = new float[userAmount];
 
         Random rand = new Random();
         for (int i = 0; i < userFactors.length; i++)
@@ -54,14 +56,16 @@ public class MatrixFactorizationModel {
             for (RatingTriplet triplet : triplets) {
                 int u = triplet.userIndex();
                 int i = triplet.coffeeIndex();
+                long t = triplet.timestamp();
                 int uOffset = u * K;
                 int iOffset = i * K;
                 float dotProcuct = 0; // Pu · Qi
                 for (int k = 0; k < K; k++) {
                     dotProcuct += userFactors[uOffset + k] * coffeeFactors[iOffset + k];
                 }
-                // (Score) Rui = μ + Bu + Bi + (Pu · Qi)
-                float prediction = mean + userBiases[u] + coffeeBiases[i] + dotProcuct;
+                // (Score) Rui = μ + Bu(t) + Bi + (Pu · Qi)
+                float prediction = mean + userBiasT(t, userMeanTimestamps[u], userBiases[u], userAlphas[u])
+                        + coffeeBiases[i] + dotProcuct;
                 float error = triplet.score() - prediction;
                 totalError += (error * error); // square error
                 // update biases:
@@ -69,6 +73,9 @@ public class MatrixFactorizationModel {
                 userBiases[u] += learningRate * (error - regularization * userBiases[u]);
                 // Bi += gamma * (e - lambda * Bi)
                 coffeeBiases[i] += learningRate * (error - regularization * coffeeBiases[i]);
+                // Au += gamma * (e * devU(t) - lambda * Au)
+                userAlphas[u] += learningRate
+                        * (error * userDevT(t, userMeanTimestamps[u]) - regularization * userAlphas[u]);
                 // update latent factors
                 for (int k = 0; k < K; k++) {
                     float p_uk = userFactors[uOffset + k];
@@ -113,5 +120,14 @@ public class MatrixFactorizationModel {
                 .metadata(metadata)
                 .build();
         repository.save(artifact);
+    }
+
+    private float userBiasT(long t, float Tu, float Bu, float alpha) {
+        return Bu + alpha * userDevT(t, Tu);
+    }
+
+    private float userDevT(long t, float Tu) {
+        float timeDiff = Math.abs(t - Tu);
+        return Math.signum(timeDiff) * (float) Math.pow(timeDiff, config.getBeta());
     }
 }
