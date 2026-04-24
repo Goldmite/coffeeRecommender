@@ -33,14 +33,18 @@ public class MatrixFactorizationModel {
         int userAmount = data.userMapper().getSize();
         int coffeeAmount = data.coffeeMapper().getSize();
         float mean = data.globalMean();
-        float[] userMeanTimestamps = data.userMeanTimestamps();
         List<RatingTriplet> triplets = data.triplets();
 
         float[] userFactors = new float[userAmount * K];
         float[] coffeeFactors = new float[coffeeAmount * K];
         float[] userBiases = new float[userAmount];
         float[] coffeeBiases = new float[coffeeAmount];
+
         float[] userAlphas = new float[userAmount];
+        int binAmount = 6; // 2 years / 4 months
+        float[] coffeeBinBiases = new float[coffeeAmount * binAmount];
+        float[] devs = data.temporal().deviations();
+        long binPeriodSeconds = 10368000; // ~ 4 months
 
         Random rand = new Random();
         for (int i = 0; i < userFactors.length; i++)
@@ -56,26 +60,33 @@ public class MatrixFactorizationModel {
             for (RatingTriplet triplet : triplets) {
                 int u = triplet.userIndex();
                 int i = triplet.coffeeIndex();
-                long t = triplet.timestamp();
                 int uOffset = u * K;
                 int iOffset = i * K;
-                float dotProcuct = 0; // Pu · Qi
+                // coffee periodical bins (discrete)
+                int binIdx = (int) ((triplet.timestamp() - data.temporal().minTimestamp()) / binPeriodSeconds);
+                binIdx = Math.min(binIdx, binAmount - 1); // cap at most recent period
+                int bOffset = i * binAmount + binIdx;
+
+                float dotProduct = 0; // Pu · Qi
                 for (int k = 0; k < K; k++) {
-                    dotProcuct += userFactors[uOffset + k] * coffeeFactors[iOffset + k];
+                    dotProduct += userFactors[uOffset + k] * coffeeFactors[iOffset + k];
                 }
-                // (Score) Rui = μ + Bu(t) + Bi + (Pu · Qi)
-                float prediction = mean + userBiasT(t, userMeanTimestamps[u], userBiases[u], userAlphas[u])
-                        + coffeeBiases[i] + dotProcuct;
+                // PREDICTION (Score): Rui = μ + Bu(t) + (Bi + Bi_bin) + (Pu · Qi)
+                float prediction = mean + userBiasT(userBiases[u], userAlphas[u], devs[u])
+                        + (coffeeBiases[i] + coffeeBinBiases[bOffset]) + dotProduct;
+
                 float error = triplet.score() - prediction;
                 totalError += (error * error); // square error
-                // update biases:
+                // update biases
                 // Bu += gamma * (e - lambda * Bu)
                 userBiases[u] += learningRate * (error - regularization * userBiases[u]);
                 // Bi += gamma * (e - lambda * Bi)
                 coffeeBiases[i] += learningRate * (error - regularization * coffeeBiases[i]);
+                // update temporal data
                 // Au += gamma * (e * devU(t) - lambda * Au)
-                userAlphas[u] += learningRate
-                        * (error * userDevT(t, userMeanTimestamps[u]) - regularization * userAlphas[u]);
+                userAlphas[u] += learningRate * (error * devs[u] - regularization * userAlphas[u]);
+                // Bi_bin += gamma * (e - lamdba * Bi_bin)
+                coffeeBinBiases[i] += learningRate * (error - regularization * coffeeBinBiases[i]);
                 // update latent factors
                 for (int k = 0; k < K; k++) {
                     float p_uk = userFactors[uOffset + k];
@@ -90,7 +101,8 @@ public class MatrixFactorizationModel {
             rmse = Math.sqrt(totalError / triplets.size());
             System.out.printf("Epoch %d/%d - RMSE: %.4f%n", epoch + 1, epochs, rmse);
         }
-        TrainedModel model = new TrainedModel(userFactors, coffeeFactors, userBiases, coffeeBiases, K, mean,
+        TrainedModel model = new TrainedModel(userFactors, coffeeFactors, userBiases, coffeeBiases, userAlphas,
+                coffeeBinBiases, K, mean,
                 data.userMapper(),
                 data.coffeeMapper());
         return new TrainingResult(model, rmse);
@@ -122,12 +134,7 @@ public class MatrixFactorizationModel {
         repository.save(artifact);
     }
 
-    private float userBiasT(long t, float Tu, float Bu, float alpha) {
-        return Bu + alpha * userDevT(t, Tu);
-    }
-
-    private float userDevT(long t, float Tu) {
-        float timeDiff = Math.abs(t - Tu);
-        return Math.signum(timeDiff) * (float) Math.pow(timeDiff, config.getBeta());
+    private float userBiasT(float Bu, float alpha, float devT) {
+        return Bu + alpha * devT;
     }
 }

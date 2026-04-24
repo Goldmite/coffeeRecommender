@@ -9,5 +9,5 @@ public record PreparedTrainingData(
         IndexMapper userMapper,
         IndexMapper coffeeMapper,
         float globalMean,
-        float[] userMeanTimestamps) {
+        TemporalData temporal) {
 }
