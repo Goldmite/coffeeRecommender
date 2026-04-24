@@ -95,6 +95,10 @@ flyway {
 flywayMigrate.dependsOn classes
 
 protobuf {
+    protoc {
+        // explicit for pipeline
+        artifact = 'com.google.protobuf:protoc:4.34.1'
+    }
     generateProtoTasks {
         all().each { task ->
             task.builtins {
