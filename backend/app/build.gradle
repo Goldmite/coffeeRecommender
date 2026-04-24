@@ -15,11 +15,11 @@ buildscript {
 }
 
 plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
     id 'java'
     id 'org.springframework.boot' version '4.0.0'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.flywaydb.flyway' version "12.1.1"
+    id "com.google.protobuf" version "0.10.0"
 }
 
 group='org.recsys'
@@ -46,6 +46,8 @@ dependencies {
     // Lucene for TF-IDF
     implementation 'org.apache.lucene:lucene-core:10.4.0'
     implementation 'org.apache.lucene:lucene-analysis-common:10.4.0'
+    // Protobuf serialization
+    implementation 'com.google.protobuf:protobuf-java:4.34.1'
 
     // Spring Boot Developer Tools: Provides fast application restarts and live reloading during development.
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -91,6 +93,33 @@ flyway {
 }
 
 flywayMigrate.dependsOn classes
+
+protobuf {
+    protoc {
+        // explicit for pipeline
+        artifact = 'com.google.protobuf:protoc:4.34.1'
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {}
+            }
+        }
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs 'build/generated/sources/proto/main/java'
+        }
+    }
+    test {
+        java {
+            srcDirs 'build/generated/sources/proto/test/java', 'build/generated/sources/proto/main/java'
+        }
+    }
+}
 
 test {
   useJUnitPlatform()

@@ -1,6 +1,6 @@
 spring:
   profiles: 
-    active: "demo"
+    active: "test"
   datasource:
     url: jdbc:postgresql://localhost:5432/${POSTGRES_DB}
     username: ${POSTGRES_USER}
@@ -22,3 +22,10 @@ app:
     seed: 22
   weights:
     soft-features: 0.8
+
+recommendation:
+  mf:
+    latent-factors: 50
+    learning-rate: 0.015
+    regularization: 0.02
+    epochs: 100

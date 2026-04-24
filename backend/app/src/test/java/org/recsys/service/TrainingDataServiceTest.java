@@ -57,9 +57,9 @@ class TrainingDataServiceTest {
         // verify Index Mapping: should have the same internal index for both
         assertEquals(triplets.get(0).userIndex(), triplets.get(1).userIndex());
         assertEquals(4.0f, triplets.get(0).score());
-        assertEquals(5.0f, triplets.get(1).score());
-        // verify global mean: (4.0 + 5.0) / 2 = 4.5
-        assertEquals(4.5f, result.globalMean(), 0.001f);
+        assertEquals(3.0f, triplets.get(1).score());
+        // verify global mean: (4.0 + 3.0) / 2 = 3.5
+        assertEquals(3.5f, result.globalMean(), 0.001f);
     }
 
     @Test
@@ -88,7 +88,7 @@ class TrainingDataServiceTest {
         // when
         PreparedTrainingData result = trainingDataService.prepareData(false);
         // then
-        assertEquals(2.0f, result.triplets().getFirst().score(), "Click should result in score of 2.0");
+        assertEquals(1.7f, result.triplets().getFirst().score(), "Click should result in score of 1.7");
     }
 
     @Test

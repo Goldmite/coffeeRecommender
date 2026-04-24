@@ -27,7 +27,7 @@ public class TrainingDataService {
         List<UserInteractions> interactions = getAllUserInteractions();
 
         IndexMapper userMapper = new IndexMapper();
-        IndexMapper itemMapper = new IndexMapper();
+        IndexMapper coffeeMapper = new IndexMapper();
         List<RatingTriplet> triplets = new ArrayList<>();
 
         double totalRatingSum = 0;
@@ -35,7 +35,7 @@ public class TrainingDataService {
         for (UserInteractions ui : interactions) {
             // 1. Get/Create indices
             int uIdx = userMapper.getInternalIndex(ui.getUserId());
-            int iIdx = itemMapper.getInternalIndex(ui.getCoffeeId());
+            int iIdx = coffeeMapper.getInternalIndex(ui.getCoffeeId());
             // 2. Determine the score
             float score = calculateScore(ui);
             totalRatingSum += score;
@@ -49,16 +49,16 @@ public class TrainingDataService {
         if (shuffled)
             Collections.shuffle(triplets);
 
-        return new PreparedTrainingData(triplets, userMapper, itemMapper, globalMean);
+        return new PreparedTrainingData(triplets, userMapper, coffeeMapper, globalMean);
     }
 
     private float calculateScore(UserInteractions ui) {
         if (ui.getRating() != null && ui.getRating() > 0)
             return ui.getRating().floatValue();
         if (ui.getIsPurchased())
-            return 5.0f;
+            return 3.0f;
         if (ui.getIsClicked())
-            return 2.0f;
+            return 1.7f;
         return 0.0f;
     }
 }
