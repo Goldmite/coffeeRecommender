@@ -13,6 +13,7 @@ public interface CoffeeRepository extends JpaRepository<CoffeeBean, Long> {
         @Query("SELECT f.description FROM CoffeeBean c JOIN c.features f")
         List<String> findAllDescriptions();
 
+        @Query("SELECT id FROM CoffeeBean")
         List<Long> findAllIds();
 
         @Query(value = "SELECT * FROM coffee_beans c " +

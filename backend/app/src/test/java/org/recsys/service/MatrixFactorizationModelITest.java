@@ -58,6 +58,7 @@ class MatrixFactorizationModelITest {
 
         private User savedUser1;
         private User savedUser2;
+        private final long now = Instant.now().getEpochSecond();
 
         @BeforeEach
         void setup() {
@@ -84,9 +85,9 @@ class MatrixFactorizationModelITest {
                 TrainingResult result = mfModel.train(data, 0.02f, 0.02f, 25, 50);
                 TrainedModel model = result.model();
                 // Assert: Verify the predictions reflect the training data
-                float predictionLike = model.predict(savedUser1.getId(), 10L);
-                float predictionDislike = model.predict(savedUser1.getId(), 20L);
-                float predictionUser2 = model.predict(savedUser2.getId(), 20L);
+                float predictionLike = model.predict(savedUser1.getId(), 10L, now);
+                float predictionDislike = model.predict(savedUser1.getId(), 20L, now);
+                float predictionUser2 = model.predict(savedUser2.getId(), 20L, now);
                 // User 1's prediction for Coffee 10 should be significantly higher than for
                 // Coffee 20
                 assertTrue(predictionLike > predictionDislike,
@@ -115,8 +116,10 @@ class MatrixFactorizationModelITest {
                                 new float[] { 0.2f }, // coffeeBiases
                                 new float[] { 0.3f, 0.5f }, // userAlphas
                                 new float[] { 0.3f, 0.1f, 0.1f, 0.4f, 0.5f, 0.6f }, // coffeeBinBiases
+                                new float[] {}, // userTimestampMeans
                                 2, // K
-                                3.5f, // globalMean
+                                2.5f, // globalMean
+                                now - 10000, // minTimestamp
                                 userMapper,
                                 coffeeMapper);
 
@@ -175,8 +178,8 @@ class MatrixFactorizationModelITest {
         private TrainingResult createDummyResult() {
                 TrainedModel model = new TrainedModel(
                                 new float[0], new float[0], new float[0],
-                                new float[0], new float[0], new float[0],
-                                2, 3.0f, new IndexMapper(), new IndexMapper());
+                                new float[0], new float[0], new float[0], new float[0],
+                                2, 3.0f, now, new IndexMapper(), new IndexMapper());
                 return new TrainingResult(model, 0.5f);
         }
 }
