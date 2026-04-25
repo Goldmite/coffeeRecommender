@@ -1,6 +1,6 @@
 package org.recsys.dto.recommendation;
 
-public interface CoffeeCandidate {
+public interface SimilarCoffees {
     Long getId();
 
     Double getDistance();

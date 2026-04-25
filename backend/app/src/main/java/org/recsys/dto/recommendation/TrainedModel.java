@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.recsys.mapper.IndexMapper;
 import org.recsys.proto.TrainedModelProto;
+import org.recsys.util.PredictionUtils;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -15,12 +16,14 @@ public record TrainedModel(
         float[] coffeeBiases,
         float[] userAlphas,
         float[] coffeeBinBiases,
+        float[] userTimestampMeans,
         int K,
         float globalMean,
+        long minTimestamp,
         IndexMapper userMapper,
         IndexMapper coffeeMapper) {
 
-    public float predict(Long userId, Long coffeeId) {
+    public float predict(Long userId, Long coffeeId, long targetTimestamp) {
         Integer u = userMapper.getInternalIndex(userId);
         Integer i = coffeeMapper.getInternalIndex(coffeeId);
         // fallback
@@ -29,12 +32,18 @@ public record TrainedModel(
 
         int uOffset = u * K;
         int iOffset = i * K;
+        int binIdx = PredictionUtils.calculateBinIndex(targetTimestamp, minTimestamp);
+        int bOffset = PredictionUtils.getCoffeeBinOffset(i, binIdx);
+
+        float dev = PredictionUtils.calculateUserDev(targetTimestamp, userTimestampMeans[u], 0.4);
 
         float dotProduct = 0;
         for (int k = 0; k < K; k++) {
             dotProduct += userFactors[uOffset + k] * coffeeFactors[iOffset + k];
         }
-        return globalMean + userBiases[u] + coffeeFactors[i] + dotProduct;
+        // PREDICTION (Score)
+        return PredictionUtils.calculatePrediction(globalMean, userBiases[u], userAlphas[u], dev, coffeeBiases[i],
+                coffeeBinBiases[bOffset], dotProduct);
     }
 
     public byte[] serialize() {
@@ -45,8 +54,10 @@ public record TrainedModel(
                 .addAllCoffeeBiases(floatArrayToList(coffeeBiases))
                 .addAllUserAlphas(floatArrayToList(userAlphas))
                 .addAllCoffeeBinBiases(floatArrayToList(coffeeBinBiases))
+                .addAllUserTimestampMeans(floatArrayToList(userTimestampMeans))
                 .setK(K)
                 .setGlobalMean(globalMean)
+                .setMinTimestamp(minTimestamp)
                 .putAllUserIdToIdx(userMapper.getInternalMap())
                 .putAllCoffeeIdToIdx(coffeeMapper.getInternalMap())
                 .build();
@@ -63,8 +74,10 @@ public record TrainedModel(
                 listToFloatArray(proto.getCoffeeBiasesList()),
                 listToFloatArray(proto.getUserAlphasList()),
                 listToFloatArray(proto.getCoffeeBinBiasesList()),
+                listToFloatArray(proto.getUserTimestampMeansList()),
                 proto.getK(),
                 proto.getGlobalMean(),
+                proto.getMinTimestamp(),
                 new IndexMapper(proto.getUserIdToIdxMap()),
                 new IndexMapper(proto.getCoffeeIdToIdxMap()));
     }
