@@ -30,3 +30,6 @@ recommendation:
     regularization: 0.02
     epochs: 100
     beta: 0.4
+  hybrid:
+    cf: 0.6
+    cf-adaptation-rate: 0.05

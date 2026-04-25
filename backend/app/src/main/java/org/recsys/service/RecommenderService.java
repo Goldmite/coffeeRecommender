@@ -2,12 +2,20 @@ package org.recsys.service;
 
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.recsys.config.HybridConfig;
 import org.recsys.dto.recommendation.Candidate;
+import org.recsys.dto.recommendation.RecommendationDto;
 import org.recsys.dto.recommendation.SimilarCoffees;
 import org.recsys.dto.recommendation.TrainedModel;
+import org.recsys.mapper.CoffeeMapper;
+import org.recsys.model.CoffeeBean;
 import org.recsys.repository.CoffeeRepository;
+import org.recsys.repository.UserInteractionsRepository;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -18,10 +26,60 @@ public class RecommenderService {
 
     private final CoffeeRepository coffeeRepository;
     private final ModelProvider provider;
+    private final UserPreferencesService preferencesService;
+    private final UserInteractionsRepository interactionsRepository;
+    private final HybridConfig config;
+    private final CoffeeMapper mapper;
+
+    public List<RecommendationDto> getHybridRecommendations(Long userId, int limit) {
+        List<Candidate> cfCandidates = getCFCandidates(userId, limit);
+        List<Candidate> cbfCandidates = getCBFCandidates(userId, limit);
+
+        float cfWeight = determineCfWeight(userId);
+        float cbfWeight = 1 - cfWeight;
+        Map<Long, Float> hybridScores = new HashMap<>();
+        // add CF results
+        for (Candidate cf : cfCandidates) {
+            hybridScores.put(cf.id(), cf.similarity() * cfWeight);
+        }
+
+        // add CBF results
+        for (Candidate cbf : cbfCandidates) {
+            float currentScore = hybridScores.getOrDefault(cbf.id(), 0f);
+            float weightedCbfScore = cbf.similarity() * cbfWeight;
+            float finalScore = currentScore + weightedCbfScore;
+
+            if (currentScore > 0) {
+                finalScore *= 1.1f; // +10% for agreement of both methods
+            }
+
+            hybridScores.put(cbf.id(), finalScore);
+        }
+        // rank
+        List<Long> rankedIds = hybridScores.entrySet().stream()
+                .sorted(Map.Entry.<Long, Float>comparingByValue().reversed())
+                .limit(limit)
+                .map(Map.Entry::getKey)
+                .toList();
+
+        Map<Long, CoffeeBean> coffeeMap = coffeeRepository.findAllById(rankedIds)
+                .stream().collect(Collectors.toMap(CoffeeBean::getId, c -> c));
+        // keep sorted order
+        return rankedIds.stream()
+                .filter(coffeeMap::containsKey)
+                .map(id -> new RecommendationDto(
+                        mapper.toResponse(coffeeMap.get(id)),
+                        hybridScores.get(id)))
+                .toList();
+    }
 
     // Find Top N candidates by target - user coffee preference vector
-    public List<SimilarCoffees> getSimilarCoffees(float[] target, int n) {
-        return coffeeRepository.findTopSimilarCoffeeCandidates(target, n);
+    public List<Candidate> getCBFCandidates(Long userId, int n) {
+        float[] target = preferencesService.getUserPreferenceFlavorProfile(userId);
+
+        List<SimilarCoffees> coffees = coffeeRepository.findTopSimilarCoffeeCandidates(target, n);
+
+        return coffees.stream().map(c -> new Candidate(c.getId(), c.getSimilarityScore().floatValue(), "CBF")).toList();
     }
 
     public List<Candidate> getCFCandidates(Long userId, int n) {
@@ -39,6 +97,17 @@ public class RecommenderService {
                 .sorted(Comparator.comparing(Candidate::similarity).reversed())
                 .limit(n)
                 .toList();
+    }
+
+    private float determineCfWeight(Long userId) {
+        int interactionCount = interactionsRepository.countByUserId(userId);
+        // cold start (new user)
+        if (interactionCount == 0)
+            return 0.0f; // fallback to CBF
+        // for every interaction, add to CF weight, maxing at config value
+        float dynamicWeight = interactionCount * config.getCfAdaptationRate();
+
+        return Math.min(dynamicWeight, config.getCf());
     }
 
 }
