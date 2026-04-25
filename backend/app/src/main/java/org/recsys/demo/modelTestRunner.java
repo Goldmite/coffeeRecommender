@@ -1,5 +1,7 @@
 package org.recsys.demo;
 
+import java.time.Instant;
+
 import org.recsys.dto.recommendation.PreparedTrainingData;
 import org.recsys.dto.recommendation.TrainedModel;
 import org.recsys.dto.recommendation.TrainingResult;
@@ -42,7 +44,7 @@ public class modelTestRunner implements CommandLineRunner {
         System.out.println("✅ Training Complete!");
 
         // 3. Test a dummy prediction
-        float predicted = model.predict(1L, 1L);
+        float predicted = model.predict(1L, 1L, Instant.now().getEpochSecond());
         System.out.println("🔮 Prediction for User 1 on Coffee 1: " + predicted);
     }
 }

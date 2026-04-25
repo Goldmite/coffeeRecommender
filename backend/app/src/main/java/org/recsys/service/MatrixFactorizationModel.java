@@ -11,6 +11,7 @@ import org.recsys.dto.recommendation.TrainingResult;
 import org.recsys.model.ModelMetadata;
 import org.recsys.model.TrainedModelArtifact;
 import org.recsys.repository.TrainedModelRepository;
+import org.recsys.util.PredictionUtils;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -41,9 +42,7 @@ public class MatrixFactorizationModel {
         float[] coffeeBiases = new float[coffeeAmount];
 
         float[] userAlphas = new float[userAmount];
-        int binAmount = 6; // 2 years / 4 months
-        float[] coffeeBinBiases = new float[coffeeAmount * binAmount];
-        long binPeriodSeconds = 10368000; // ~ 4 months
+        float[] coffeeBinBiases = new float[coffeeAmount * PredictionUtils.TOTAL_BINS];
 
         Random rand = new Random();
         for (int i = 0; i < userFactors.length; i++)
@@ -62,17 +61,16 @@ public class MatrixFactorizationModel {
                 int uOffset = u * K;
                 int iOffset = i * K;
                 // coffee periodical bins (discrete)
-                int binIdx = (int) ((triplet.timestamp() - data.minTimestamp()) / binPeriodSeconds);
-                binIdx = Math.min(binIdx, binAmount - 1); // cap at most recent period
-                int bOffset = i * binAmount + binIdx;
+                int binIdx = PredictionUtils.calculateBinIndex(triplet.timestamp(), data.minTimestamp());
+                int bOffset = PredictionUtils.getCoffeeBinOffset(i, binIdx);
 
                 float dotProduct = 0; // Pu · Qi
                 for (int k = 0; k < K; k++) {
                     dotProduct += userFactors[uOffset + k] * coffeeFactors[iOffset + k];
                 }
-                // PREDICTION (Score): Rui = μ + Bu(t) + (Bi + Bi_bin) + (Pu · Qi)
-                float prediction = mean + (userBiases[u] + userAlphas[u] * triplet.dev())
-                        + (coffeeBiases[i] + coffeeBinBiases[bOffset]) + dotProduct;
+                // PREDICTION (Score)
+                float prediction = PredictionUtils.calculatePrediction(mean, userBiases[u], userAlphas[u],
+                        triplet.dev(), coffeeBiases[i], coffeeBinBiases[bOffset], dotProduct);
 
                 float error = triplet.score() - prediction;
                 totalError += (error * error); // square error
@@ -101,7 +99,7 @@ public class MatrixFactorizationModel {
             System.out.printf("Epoch %d/%d - RMSE: %.4f%n", epoch + 1, epochs, rmse);
         }
         TrainedModel model = new TrainedModel(userFactors, coffeeFactors, userBiases, coffeeBiases, userAlphas,
-                coffeeBinBiases, K, mean,
+                coffeeBinBiases, data.userTimestampMeans(), K, mean, data.minTimestamp(),
                 data.userMapper(),
                 data.coffeeMapper());
         return new TrainingResult(model, rmse);

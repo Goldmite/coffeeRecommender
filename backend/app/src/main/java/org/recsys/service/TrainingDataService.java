@@ -12,6 +12,7 @@ import org.recsys.dto.recommendation.RatingTriplet;
 import org.recsys.mapper.IndexMapper;
 import org.recsys.model.UserInteractions;
 import org.recsys.repository.UserInteractionsRepository;
+import org.recsys.util.PredictionUtils;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -64,8 +65,7 @@ public class TrainingDataService {
             int iIdx = coffeeMapper.getInternalIndex(ui.getCoffeeId());
             long t = ui.getCreatedAt().getEpochSecond();
             // User deviation over time (continuous)
-            float timeDiff = (t - userTimestampMeans[uIdx]) / 86400.0f; // days
-            float dev = (float) (Math.signum(timeDiff) * Math.pow(Math.abs(timeDiff), config.getBeta()));
+            float dev = PredictionUtils.calculateUserDev(t, userTimestampMeans[uIdx], config.getBeta());
             // Determine the score
             float score = calculateScore(ui);
             totalRatingSum += score;
@@ -78,7 +78,8 @@ public class TrainingDataService {
         if (shuffled)
             Collections.shuffle(triplets);
 
-        return new PreparedTrainingData(triplets, userMapper, coffeeMapper, globalMean, minTimestamp);
+        return new PreparedTrainingData(triplets, userMapper, coffeeMapper, globalMean, minTimestamp,
+                userTimestampMeans);
     }
 
     private float calculateScore(UserInteractions ui) {
