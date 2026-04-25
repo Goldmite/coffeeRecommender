@@ -16,9 +16,11 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MatrixFactorizationModel {
 
     private final MatrixFactorizationConfig config;
@@ -96,7 +98,7 @@ public class MatrixFactorizationModel {
             }
             // root mean square error
             rmse = Math.sqrt(totalError / triplets.size());
-            System.out.printf("Epoch %d/%d - RMSE: %.4f%n", epoch + 1, epochs, rmse);
+            log.debug("Epoch %d/%d - RMSE: %.4f%n", epoch + 1, epochs, rmse);
         }
         TrainedModel model = new TrainedModel(userFactors, coffeeFactors, userBiases, coffeeBiases, userAlphas,
                 coffeeBinBiases, data.userTimestampMeans(), K, mean, data.minTimestamp(),

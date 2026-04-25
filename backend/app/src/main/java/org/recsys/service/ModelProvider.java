@@ -1,8 +1,10 @@
 package org.recsys.service;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import org.recsys.dto.recommendation.TrainedModel;
+import org.recsys.model.TrainedModelArtifact;
 import org.recsys.repository.TrainedModelRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,17 +23,22 @@ public class ModelProvider {
         return Optional.ofNullable(currentModel);
     }
 
-    public void refreshModel() {
-        repository.findByIsActiveTrue().ifPresentOrElse(entity -> {
+    public Instant refreshModel() {
+        Optional<TrainedModelArtifact> artifact = repository.findByIsActiveTrue();
+
+        if (artifact.isPresent()) {
             try {
+                TrainedModelArtifact entity = artifact.get();
                 TrainedModel model = TrainedModel.deserialize(entity.getData());
                 // update in-memory model
                 this.currentModel = model;
                 log.info("Model refreshed to version: {} with RMSE: {}", entity.getVersion(), entity.getRmse());
+                return entity.getCreatedAt();
             } catch (Exception e) {
                 log.error("Failed to deserialize the model", e);
             }
-        }, () -> log.warn("No active model found in database. Recommendations will use fallback logic."));
+        }
+        return Instant.MIN;
     }
 
 }
