@@ -32,8 +32,9 @@ public class RecommenderService {
     private final CoffeeMapper mapper;
 
     public List<RecommendationDto> getHybridRecommendations(Long userId, int limit) {
-        List<Candidate> cfCandidates = getCFCandidates(userId, limit);
-        List<Candidate> cbfCandidates = getCBFCandidates(userId, limit);
+        int candidateLimit = Math.min(Math.max(limit * 15, 50), 150); // 15x display limit in range [50-150]
+        List<Candidate> cfCandidates = getCFCandidates(userId, candidateLimit);
+        List<Candidate> cbfCandidates = getCBFCandidates(userId, candidateLimit);
 
         float cfWeight = determineCfWeight(userId);
         float cbfWeight = 1 - cfWeight;
@@ -47,13 +48,8 @@ public class RecommenderService {
         for (Candidate cbf : cbfCandidates) {
             float currentScore = hybridScores.getOrDefault(cbf.id(), 0f);
             float weightedCbfScore = cbf.similarity() * cbfWeight;
-            float finalScore = currentScore + weightedCbfScore;
 
-            if (currentScore > 0) {
-                finalScore *= 1.1f; // +10% for agreement of both methods
-            }
-
-            hybridScores.put(cbf.id(), finalScore);
+            hybridScores.put(cbf.id(), currentScore + weightedCbfScore);
         }
         // rank
         List<Long> rankedIds = hybridScores.entrySet().stream()
@@ -102,12 +98,13 @@ public class RecommenderService {
     private float determineCfWeight(Long userId) {
         int interactionCount = interactionsRepository.countByUserId(userId);
         // cold start (new user)
-        if (interactionCount == 0)
+        if (interactionCount < config.getInflectionPoint() / 2) // half the inflection point
             return 0.0f; // fallback to CBF
-        // for every interaction, add to CF weight, maxing at config value
-        float dynamicWeight = interactionCount * config.getCfAdaptationRate();
+        // Sigmoid - cf_max / (1 + e^(-k*(x - x0)))
+        float dynamicWeight = (float) (config.getCf()
+                / (1 + Math.exp(-config.getSteepness() * (interactionCount - config.getInflectionPoint()))));
 
-        return Math.min(dynamicWeight, config.getCf());
+        return dynamicWeight;
     }
 
 }

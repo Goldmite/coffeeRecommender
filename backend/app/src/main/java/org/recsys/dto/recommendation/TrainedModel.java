@@ -18,14 +18,15 @@ public record TrainedModel(
         float[] coffeeBinBiases,
         float[] userTimestampMeans,
         int K,
+        double BETA,
         float globalMean,
         long minTimestamp,
         IndexMapper userMapper,
         IndexMapper coffeeMapper) {
 
     public float predict(Long userId, Long coffeeId, long targetTimestamp) {
-        Integer u = userMapper.getInternalIndex(userId);
-        Integer i = coffeeMapper.getInternalIndex(coffeeId);
+        Integer u = userMapper.getExistingInternalIndex(userId);
+        Integer i = coffeeMapper.getExistingInternalIndex(coffeeId);
         // fallback
         if (u == null || i == null)
             return globalMean;
@@ -35,7 +36,7 @@ public record TrainedModel(
         int binIdx = PredictionUtils.calculateBinIndex(targetTimestamp, minTimestamp);
         int bOffset = PredictionUtils.getCoffeeBinOffset(i, binIdx);
 
-        float dev = PredictionUtils.calculateUserDev(targetTimestamp, userTimestampMeans[u], 0.4);
+        float dev = PredictionUtils.calculateUserDev(targetTimestamp, userTimestampMeans[u], BETA);
 
         float dotProduct = 0;
         for (int k = 0; k < K; k++) {
@@ -56,6 +57,7 @@ public record TrainedModel(
                 .addAllCoffeeBinBiases(floatArrayToList(coffeeBinBiases))
                 .addAllUserTimestampMeans(floatArrayToList(userTimestampMeans))
                 .setK(K)
+                .setBeta(BETA)
                 .setGlobalMean(globalMean)
                 .setMinTimestamp(minTimestamp)
                 .putAllUserIdToIdx(userMapper.getInternalMap())
@@ -76,6 +78,7 @@ public record TrainedModel(
                 listToFloatArray(proto.getCoffeeBinBiasesList()),
                 listToFloatArray(proto.getUserTimestampMeansList()),
                 proto.getK(),
+                proto.getBeta(),
                 proto.getGlobalMean(),
                 proto.getMinTimestamp(),
                 new IndexMapper(proto.getUserIdToIdxMap()),

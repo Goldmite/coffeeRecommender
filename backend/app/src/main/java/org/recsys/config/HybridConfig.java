@@ -13,6 +13,9 @@ import lombok.Setter;
 public class HybridConfig {
     // cbf is implied, both weights combined = 1
     private float cf = 0.5f;
-    // increase cf weight per user interaction
-    private float cfAdaptationRate = 0.1f;
+    // growth weight - higher number makes faster switch to cf
+    private float steepness = 0.5f;
+    // number of interactions for a user where the cf weight is exactly half of the
+    // max cf weight
+    private int inflectionPoint = 10;
 }

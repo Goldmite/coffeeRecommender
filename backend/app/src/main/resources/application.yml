@@ -31,5 +31,6 @@ recommendation:
     epochs: 100
     beta: 0.4
   hybrid:
-    cf: 0.6
-    cf-adaptation-rate: 0.05
+    cf: 0.8
+    steepness: 0.4
+    inflection-point: 10

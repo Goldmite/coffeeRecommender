@@ -118,6 +118,7 @@ class MatrixFactorizationModelITest {
                                 new float[] { 0.3f, 0.1f, 0.1f, 0.4f, 0.5f, 0.6f }, // coffeeBinBiases
                                 new float[] {}, // userTimestampMeans
                                 2, // K
+                                0.4, // beta
                                 2.5f, // globalMean
                                 now - 10000, // minTimestamp
                                 userMapper,
@@ -179,7 +180,7 @@ class MatrixFactorizationModelITest {
                 TrainedModel model = new TrainedModel(
                                 new float[0], new float[0], new float[0],
                                 new float[0], new float[0], new float[0], new float[0],
-                                2, 3.0f, now, new IndexMapper(), new IndexMapper());
+                                2, 0.4, 3.0f, now, new IndexMapper(), new IndexMapper());
                 return new TrainingResult(model, 0.5f);
         }
 }

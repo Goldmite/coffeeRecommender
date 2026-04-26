@@ -14,6 +14,7 @@ public class ModelMetadata {
     private float gamma;
     private float lambda;
     private int epochs;
+    private double beta;
     private int userCount;
     private int coffeeCount;
 }

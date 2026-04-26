@@ -101,7 +101,7 @@ public class MatrixFactorizationModel {
             log.debug("Epoch %d/%d - RMSE: %.4f%n", epoch + 1, epochs, rmse);
         }
         TrainedModel model = new TrainedModel(userFactors, coffeeFactors, userBiases, coffeeBiases, userAlphas,
-                coffeeBinBiases, data.userTimestampMeans(), K, mean, data.minTimestamp(),
+                coffeeBinBiases, data.userTimestampMeans(), K, config.getBeta(), mean, data.minTimestamp(),
                 data.userMapper(),
                 data.coffeeMapper());
         return new TrainingResult(model, rmse);
@@ -118,6 +118,7 @@ public class MatrixFactorizationModel {
                 .gamma(config.getLearningRate())
                 .lambda(config.getRegularization())
                 .epochs(config.getEpochs())
+                .beta(config.getBeta())
                 .userCount(model.userMapper().getSize())
                 .coffeeCount(model.coffeeMapper().getSize())
                 .build();
