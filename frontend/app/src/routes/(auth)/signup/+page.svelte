@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import AuthButton from '$lib/components/auth/AuthButton.svelte';
+	import AuthButton from '$lib/components/core/SubmitButton.svelte';
 	import AuthCard from '$lib/components/auth/AuthCard.svelte';
 	import AuthHeader from '$lib/components/auth/AuthHeader.svelte';
 	import AuthInputField from '$lib/components/auth/AuthInputField.svelte';
@@ -67,6 +67,6 @@
 				title={m.auth_prompt_password_format()}
 			/>
 		</AuthInputField>
-		<AuthButton btnText={m.user_signup()} />
+		<AuthButton>{m.user_signup()}</AuthButton>
 	</form>
 </AuthCard>
