@@ -31,4 +31,13 @@ public class UserPreferencesService {
     public Optional<UserPreferences> getUserPreferencesByUserId(Long userId) {
         return preferencesRepository.findById(userId);
     }
+
+    public float[] getUserPreferenceFlavorProfile(Long userId) {
+        Optional<UserPreferences> pref = getUserPreferencesByUserId(userId);
+        if (pref.isPresent()) {
+            return pref.get().getTasteProfile();
+        } else {
+            return vectorService.createBaseVector(); // fallback
+        }
+    }
 }

@@ -40,6 +40,10 @@ public class IndexMapper {
         return internalToExternal.get(internalIdx);
     }
 
+    public Integer getExistingInternalIndex(Long externalIdx) {
+        return externalToInternal.get(externalIdx);
+    }
+
     public int getSize() {
         return externalToInternal.size();
     }

@@ -62,19 +62,4 @@ public class CoffeeController {
         return ResponseEntity
                 .ok(coffeeService.batchUpdateCoffeeVectors().stream().map(bean -> mapper.toResponse(bean)).toList());
     }
-
-    // TODO: move to different controller
-    /*
-     * @GetMapping("/recommendations")
-     * public ResponseEntity<List<CoffeeRecommendationResponse>>
-     * getTopNSimilarCoffees(@RequestParam Long userId,
-     * 
-     * @RequestParam(defaultValue = "5") int n) throws NotFoundException {
-     * UserPreferences pref = preferencesService.getUserPreferencesByUserId(userId)
-     * .orElseThrow(() -> new NotFoundException());
-     * float[] target = pref.getTasteProfile();
-     * return ResponseEntity
-     * .ok(coffeeService.getSimilarCoffees(target, n));
-     * }
-     */
 }

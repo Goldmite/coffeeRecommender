@@ -1,6 +1,6 @@
 spring:
-  profiles: 
-    active: "test"
+  #profiles: 
+  #  active: "test"
   datasource:
     url: jdbc:postgresql://localhost:5432/${POSTGRES_DB}
     username: ${POSTGRES_USER}
@@ -30,3 +30,7 @@ recommendation:
     regularization: 0.02
     epochs: 100
     beta: 0.4
+  hybrid:
+    cf: 0.8
+    steepness: 0.4
+    inflection-point: 10
