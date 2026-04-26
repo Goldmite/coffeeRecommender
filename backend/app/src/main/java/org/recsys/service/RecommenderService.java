@@ -64,8 +64,8 @@ public class RecommenderService {
         return rankedIds.stream()
                 .filter(coffeeMap::containsKey)
                 .map(id -> new RecommendationDto(
-                        mapper.toResponse(coffeeMap.get(id)),
-                        hybridScores.get(id)))
+                        hybridScores.get(id),
+                        mapper.toResponse(coffeeMap.get(id))))
                 .toList();
     }
 

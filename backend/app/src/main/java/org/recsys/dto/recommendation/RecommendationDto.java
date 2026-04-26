@@ -3,6 +3,6 @@ package org.recsys.dto.recommendation;
 import org.recsys.dto.coffee.CoffeeBeanResponse;
 
 public record RecommendationDto(
-        CoffeeBeanResponse coffee,
-        float score) {
+                float score,
+                CoffeeBeanResponse coffee) {
 }
