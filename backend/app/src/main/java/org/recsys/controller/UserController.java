@@ -39,16 +39,8 @@ public class UserController {
                 .authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
         UserResponse userRes = UserResponse.fromEntity(userService.login(request));
-        String token = jwtUtils.generateToken(request.getEmail());
+        String token = jwtUtils.generateToken(request.getEmail(), userRes.getId());
 
         return ResponseEntity.ok(new AuthResponse(token, userRes));
     }
-    /*
-     * Add when needed and test it
-     * 
-     * @GetMapping("/{id}")
-     * public User getUserById(@PathVariable Long id) {
-     * return userService.getUserById(id);
-     * }
-     */
 }
