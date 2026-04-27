@@ -6,7 +6,9 @@ import org.recsys.dto.coffee.CoffeeBeanRequest;
 import org.recsys.dto.coffee.CoffeeVectorizationDto;
 import org.recsys.mapper.CoffeeMapper;
 import org.recsys.model.CoffeeBean;
+import org.recsys.model.Shop;
 import org.recsys.repository.CoffeeRepository;
+import org.recsys.repository.ShopRepository;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ public class CoffeeService {
     private final CoffeeRepository coffeeRepository;
     private final CoffeeMapper mapper;
     private final CoffeeVectorService vectorService;
+    private final ShopRepository shopRepository;
 
     public CoffeeBean getCoffeeById(Long id) throws NotFoundException {
         return coffeeRepository.findById(id).orElseThrow(() -> new NotFoundException());
@@ -32,6 +35,10 @@ public class CoffeeService {
     @Transactional
     public CoffeeBean addCoffee(CoffeeBeanRequest req) {
         CoffeeBean newCoffee = mapper.toEntity(req);
+
+        Shop shopProxy = shopRepository.getReferenceById(req.getShopId());
+        newCoffee.setShop(shopProxy);
+
         if (newCoffee.getFeatures() != null) {
             newCoffee.getFeatures().setCoffeeBean(newCoffee);
         }
@@ -44,6 +51,11 @@ public class CoffeeService {
         CoffeeBean bean = coffeeRepository.findById(id).orElseThrow(() -> new NotFoundException());
 
         mapper.updateEntityFromDto(req, bean);
+
+        if (req.getShopId() != null) {
+            Shop shopProxy = shopRepository.getReferenceById(req.getShopId());
+            bean.setShop(shopProxy);
+        }
 
         return coffeeRepository.save(bean);
     }

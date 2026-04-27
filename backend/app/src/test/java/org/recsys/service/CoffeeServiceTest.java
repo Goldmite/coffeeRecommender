@@ -28,6 +28,7 @@ import org.recsys.mapper.CoffeeMapper;
 import org.recsys.model.CoffeeBean;
 import org.recsys.model.CoffeeFeatures;
 import org.recsys.repository.CoffeeRepository;
+import org.recsys.repository.ShopRepository;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,6 +42,9 @@ public class CoffeeServiceTest {
 
     @Mock
     private CoffeeVectorService vectorService;
+
+    @Mock
+    private ShopRepository shopRepository;
 
     @InjectMocks
     private CoffeeService coffeeService;

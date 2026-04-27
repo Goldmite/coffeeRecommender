@@ -11,8 +11,10 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.recsys.dto.coffee.CoffeeBeanRequest;
 import org.recsys.dto.coffee.CoffeeBeanResponse;
 import org.recsys.dto.coffee.CoffeeVectorizationDto;
+import org.recsys.dto.shop.ShopResponse;
 import org.recsys.model.CoffeeBean;
 import org.recsys.model.CoffeeFeatures;
+import org.recsys.model.Shop;
 
 import io.hypersistence.utils.hibernate.type.range.Range;
 
@@ -25,13 +27,18 @@ public interface CoffeeMapper {
             "Nicaragua", "Guatemala", "Indonesia", "India");
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "shop", ignore = true) // handle in service
+    @Mapping(target = "features.id", ignore = true)
     @Mapping(target = "features.coffeeBean", ignore = true)
+    @Mapping(target = "features.flavorVector", ignore = true)
     CoffeeBean toEntity(CoffeeBeanRequest dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "coffeeBean", ignore = true)
+    @Mapping(target = "flavorVector", ignore = true)
     CoffeeFeatures toFeaturesEntity(CoffeeBeanRequest.FeaturesRequest dto);
 
+    @Mapping(target = "shop", source = "shop")
     @Mapping(target = "origins", source = "features.origins")
     @Mapping(target = "process", source = "features.process")
     @Mapping(target = "roastLevel", source = "features.roastLevel")
@@ -44,14 +51,20 @@ public interface CoffeeMapper {
     @Mapping(target = "sweetness", source = "features.sweetness")
     @Mapping(target = "bitterness", source = "features.bitterness")
     @Mapping(target = "flavorNotes", source = "features.flavorNotes")
-    @Mapping(target = "flavorVector", source = "features.flavorVector")
     CoffeeBeanResponse toResponse(CoffeeBean bean);
 
+    ShopResponse mapShop(Shop shop);
+
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "shop", ignore = true)
+    @Mapping(target = "features.id", ignore = true)
+    @Mapping(target = "features.coffeeBean", ignore = true)
+    @Mapping(target = "features.flavorVector", ignore = true)
     void updateEntityFromDto(CoffeeBeanRequest dto, @MappingTarget CoffeeBean entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "coffeeBean", ignore = true)
+    @Mapping(target = "flavorVector", ignore = true)
     void updateFeaturesFromDto(CoffeeBeanRequest.FeaturesRequest dto, @MappingTarget CoffeeFeatures subEntity);
 
     @Mapping(target = "coffeeId", source = "id")
@@ -113,6 +126,6 @@ public interface CoffeeMapper {
         if (range == null || range.isEmpty())
             return null;
 
-        return List.of(range.lower(), range.upper());
+        return List.of(range.lower(), range.upper() - 1);
     }
 }

@@ -2,9 +2,11 @@ package org.recsys.controller;
 
 import org.recsys.config.jwt.JwtUtils;
 import org.recsys.dto.user.AuthResponse;
+import org.recsys.dto.user.OnboardingRequest;
 import org.recsys.dto.user.UserLoginRequest;
 import org.recsys.dto.user.UserResponse;
 import org.recsys.dto.user.UserSignupRequest;
+import org.recsys.service.UserPreferencesService;
 import org.recsys.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,7 @@ public class UserController {
     private final AuthenticationManager authManager;
     private final JwtUtils jwtUtils;
     private final UserService userService;
+    private final UserPreferencesService prefService;
 
     @PostMapping("/signup")
     public ResponseEntity<UserResponse> signup(@Valid @RequestBody UserSignupRequest request) {
@@ -39,16 +42,16 @@ public class UserController {
                 .authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
         UserResponse userRes = UserResponse.fromEntity(userService.login(request));
-        String token = jwtUtils.generateToken(request.getEmail());
+        boolean isNew = prefService.isUserUsingDefaultPreferences(userRes.getId());
+        String token = jwtUtils.generateToken(request.getEmail(), userRes.getId(), isNew);
 
         return ResponseEntity.ok(new AuthResponse(token, userRes));
     }
-    /*
-     * Add when needed and test it
-     * 
-     * @GetMapping("/{id}")
-     * public User getUserById(@PathVariable Long id) {
-     * return userService.getUserById(id);
-     * }
-     */
+
+    @PostMapping("/preferences")
+    public ResponseEntity<?> updatePreferencesAfterSurvey(@RequestBody OnboardingRequest request) {
+        prefService.updateUserPreferencesAfterOnboarding(request);
+
+        return ResponseEntity.ok().build();
+    }
 }

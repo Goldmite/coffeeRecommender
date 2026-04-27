@@ -3,6 +3,7 @@ package org.recsys.dto.coffee;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.recsys.dto.shop.ShopResponse;
 import org.recsys.model.Processing;
 import org.recsys.model.RoastLevel;
 
@@ -15,7 +16,7 @@ public class CoffeeBeanResponse {
     String name;
     BigDecimal price;
     String productUrl;
-    int shopId;
+    ShopResponse shop;
     // features
     List<String> origins;
     Processing process;
@@ -29,5 +30,4 @@ public class CoffeeBeanResponse {
     Integer sweetness;
     Integer bitterness;
     List<String> flavorNotes;
-    float[] flavorVector;
 }

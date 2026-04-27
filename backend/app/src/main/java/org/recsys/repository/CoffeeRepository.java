@@ -10,6 +10,10 @@ import org.springframework.data.repository.query.Param;
 
 public interface CoffeeRepository extends JpaRepository<CoffeeBean, Long> {
 
+        @Override
+        @Query("SELECT c FROM CoffeeBean c JOIN FETCH c.shop WHERE c.id IN :ids")
+        List<CoffeeBean> findAllById(@Param("ids") Iterable<Long> ids);
+
         @Query("SELECT f.description FROM CoffeeBean c JOIN c.features f")
         List<String> findAllDescriptions();
 

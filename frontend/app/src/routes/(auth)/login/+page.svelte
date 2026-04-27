@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import AuthButton from '$lib/components/auth/AuthButton.svelte';
+	import AuthButton from '$lib/components/core/SubmitButton.svelte';
 	import AuthCard from '$lib/components/auth/AuthCard.svelte';
 	import AuthHeader from '$lib/components/auth/AuthHeader.svelte';
 	import AuthInputField from '$lib/components/auth/AuthInputField.svelte';
@@ -54,6 +54,6 @@
 				autocomplete="current-password"
 			/>
 		</AuthInputField>
-		<AuthButton btnText={m.user_login()} />
+		<AuthButton>{m.user_login()}</AuthButton>
 	</form>
 </AuthCard>
