@@ -8,11 +8,13 @@
 	import TasteOnboarding from '$lib/components/TasteOnboarding.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import type { RecommendationDto } from '$lib/types/recommendation';
+	import type { PageProps } from './$types';
 
-	let { form } = $props();
+	let { data, form }: PageProps = $props();
 
 	let loading = $state(false);
-	const count = $derived(form?.recommendations.length ?? 0);
+	const count = $derived(form?.recommendations?.length ?? 0);
+	const isOnboarded = $derived(form?.success || !data.needsOnboarding);
 
 	let modalRef: ReturnType<typeof DetailsModal>;
 	let selectedCoffee = $state<RecommendationDto | null>(null);
@@ -39,9 +41,7 @@
 					};
 				}}
 			>
-				{#if true}
-					<TasteOnboarding></TasteOnboarding>
-				{:else}
+				{#if isOnboarded}
 					<GenerateButton disabled={loading}>
 						{#if loading}
 							<span class="icon-[svg-spinners--180-ring]"></span>
@@ -49,6 +49,8 @@
 							{m.get_recommendations()}
 						{/if}</GenerateButton
 					>
+				{:else}
+					<TasteOnboarding></TasteOnboarding>
 				{/if}
 			</form>
 		</Card>

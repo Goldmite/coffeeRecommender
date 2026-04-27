@@ -21,9 +21,11 @@ const authHandle: Handle = async ({ event, resolve }) => {
 			const base64Payload = token.split('.')[1];
 
 			const payload = JSON.parse(atob(base64Payload));
+			const hasOnboardingCookie = event.cookies.get('onboarded') === 'true';
 
 			event.locals.userId = payload.id;
 			event.locals.userEmail = payload.sub;
+			event.locals.isNew = hasOnboardingCookie ? false : payload.new;
 		} catch (error) {
 			event.locals.userId = undefined;
 		}

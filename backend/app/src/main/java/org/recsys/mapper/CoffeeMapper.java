@@ -126,6 +126,6 @@ public interface CoffeeMapper {
         if (range == null || range.isEmpty())
             return null;
 
-        return List.of(range.lower(), range.upper());
+        return List.of(range.lower(), range.upper() - 1);
     }
 }
