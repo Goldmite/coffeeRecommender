@@ -13,7 +13,6 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.recsys.config.FeatureWeights;
 import org.recsys.model.FlavorCategory;
 import org.recsys.repository.CoffeeRepository;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -27,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 public class FlavorVectorService {
 
     private final CoffeeRepository repository;
-    private final FeatureWeights settings;
 
     private static final Map<FlavorCategory, Set<String>> FLAVOR_WHEEL = new LinkedHashMap<>() {
         {
@@ -89,7 +87,7 @@ public class FlavorVectorService {
             } else {
                 double tf = calculateCategoryTermFrequency(tokens, flavorKeywords);
                 double idf = idfMap.getOrDefault(category, 1.0);
-                vector[i] = (float) (tf * idf * settings.softWeight());
+                vector[i] = (float) (tf * idf);
             }
         }
 

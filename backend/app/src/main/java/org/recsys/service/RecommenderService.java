@@ -1,6 +1,7 @@
 package org.recsys.service;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ public class RecommenderService {
     private final CoffeeRepository coffeeRepository;
     private final ModelProvider provider;
     private final UserPreferencesService preferencesService;
+    private final WeightVectorService weightVectorService;
     private final UserInteractionsRepository interactionsRepository;
     private final HybridConfig config;
     private final CoffeeMapper mapper;
@@ -71,7 +73,9 @@ public class RecommenderService {
 
     // Find Top N candidates by target - user coffee preference vector
     public List<Candidate> getCBFCandidates(Long userId, int n) {
-        float[] target = preferencesService.getUserPreferenceFlavorProfile(userId);
+        float[] userProfile = preferencesService.getUserPreferenceFlavorProfile(userId);
+
+        float[] target = prepareTargetVector(userProfile, null);
 
         List<SimilarCoffees> coffees = coffeeRepository.findTopSimilarCoffeeCandidates(target, n);
 
@@ -93,6 +97,33 @@ public class RecommenderService {
                 .sorted(Comparator.comparing(Candidate::similarity).reversed())
                 .limit(n)
                 .toList();
+    }
+
+    public float[] prepareTargetVector(float[] userProfile, Map<Integer, Float> sessionFilters) {
+        int dim = userProfile.length;
+        float[] baseWeights = weightVectorService.getBaseWeightVector();
+        float[] targetVector = new float[dim];
+        double magnitudeSq = 0;
+
+        Map<Integer, Float> filters = (sessionFilters != null) ? sessionFilters : Collections.emptyMap();
+
+        for (int i = 0; i < dim; i++) {
+            // use filter override if present, otherwise use config weight
+            float weight = filters.getOrDefault(i, baseWeights[i]);
+            // apply weight to user profile
+            targetVector[i] = userProfile[i] * weight;
+
+            magnitudeSq += targetVector[i] * targetVector[i];
+        }
+        // re-normalize
+        float magnitude = (float) Math.sqrt(magnitudeSq);
+        if (magnitude > 1e-9) {
+            for (int i = 0; i < dim; i++) {
+                targetVector[i] /= magnitude;
+            }
+        }
+
+        return targetVector;
     }
 
     private float determineCfWeight(Long userId) {

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.recsys.config.FeatureWeights;
 import org.recsys.model.FlavorCategory;
 import org.recsys.repository.CoffeeRepository;
 
@@ -26,12 +25,10 @@ class FlavorVectorServiceTest {
 
     private FlavorVectorService service;
     private List<String> mockDescriptions;
-    private FeatureWeights settings;
 
     @BeforeEach
     void setUp() {
-        settings = new FeatureWeights(0.5f);
-        service = new FlavorVectorService(repository, settings);
+        service = new FlavorVectorService(repository);
         mockDescriptions = Arrays.asList(
                 "There is dark chocolate and nuts",
                 "This coffee has citrus and berries notes",
