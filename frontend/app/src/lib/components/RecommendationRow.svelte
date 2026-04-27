@@ -35,7 +35,7 @@
 		<span class="">{displayProcess}</span>
 	</td>
 	<td>
-		{rec.coffee.flavorNotes.join(', ')}
+		{rec.coffee.shop.name}
 	</td>
 	<td>
 		<span>{(rec.score * 100).toFixed(0)}%</span>

@@ -32,5 +32,13 @@
 	"roast_dark": "Tamsus",
 	"accuracy": "Tikslumas",
 	"no_recommendations_generated": "Nėra sugeneruotų rekomendacijų",
-	"get_recommendations": "Gauti rekomendacijas"
+	"get_recommendations": "Gauti rekomendacijas",
+	"description": "Aprašymas",
+	"altitude": "Aukštis",
+	"acidity": "Rūgštingumas",
+	"shop": "Parduotuvė",
+	"body": "Kūnas",
+	"aftertaste": "Poskonis",
+	"sweetness": "Saldumas",
+	"bitterness": "Kartumas"
 }

@@ -3,13 +3,13 @@
 	import type { RecommendationDto, Recommendations } from '$lib/types/recommendation';
 	import RecommendationRow from './RecommendationRow.svelte';
 
-	let { recommendations }: { recommendations: Recommendations | undefined } = $props();
-
-	let selectedDetails = $state<RecommendationDto | null>(null);
-
-	function handleShowDetails(rec: RecommendationDto) {
-		selectedDetails = rec;
-	}
+	let {
+		recommendations,
+		onShowDetails,
+	}: {
+		recommendations: Recommendations | undefined;
+		onShowDetails: (rec: RecommendationDto) => void;
+	} = $props();
 </script>
 
 <table>
@@ -19,14 +19,14 @@
 			<th>{m.roast()}</th>
 			<th>{m.origins()}</th>
 			<th>{m.process()}</th>
-			<th>{m.flavor_notes()}</th>
+			<th>{m.shop()}</th>
 			<th>{m.accuracy()}</th>
 			<th>{m.actions()}</th>
 		</tr>
 	</thead>
 	<tbody>
 		{#each recommendations as rec, i}
-			<RecommendationRow {rec} rowNr={i} onShowDetails={handleShowDetails} />
+			<RecommendationRow {rec} rowNr={i} {onShowDetails} />
 		{:else}
 			<tr
 				><td colspan="7" class="text-center italic p-10 text-lg bg-main-mid/10">

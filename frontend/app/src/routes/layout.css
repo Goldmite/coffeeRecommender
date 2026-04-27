@@ -40,6 +40,12 @@
 	h1 {
 		font-size: var(--text-4xl);
 	}
+	h2 {
+		font-size: var(--text-2xl);
+	}
+	h4 {
+		font-size: var(--text-lg);
+	}
 	input {
 		@apply w-full rounded-md border-2 border-main-border bg-white-taupe p-1 dark:bg-black-taupe;
 	}
@@ -60,5 +66,8 @@
 	}
 	.error-text {
 		@apply text-sm text-error;
+	}
+	.bean-border {
+		@apply rounded-tl-2xl rounded-tr-lg rounded-br-2xl rounded-bl-lg;
 	}
 }
