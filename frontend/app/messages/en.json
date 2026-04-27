@@ -33,12 +33,40 @@
   "process_washed": "Washed",
   "process_natural": "Natural",
   "process_honey": "Honey",
-  "process_other": "Other",
+  "other": "Other",
   "roast_light": "Light",
   "roast_medium_light": "Medium Light",
   "roast_medium": "Medium",
   "roast_medium_dark": "Medium Dark",
   "roast_dark": "Dark",
   "no_recommendations_generated": "No recommendations generated",
-  "get_recommendations": "Get Recommendations"
+  "get_recommendations": "Get Recommendations",
+  "coffee_beans_for_you": "Coffee beans for you",
+  "recommendation_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "Found {count} recommendation",
+        "countPlural=other": "Found {count} recommendations"
+      }
+    }
+  ],
+  "onboarding_title": "How do you brew?",
+  "xp_level": "Experience level",
+  "xp_beginner": "Beginner",
+  "xp_intermediate": "Intermediate",
+  "xp_advanced": "Advanced",
+  "xp_expert": "Expert",
+  "prep_method": "Preparation method",
+  "prep_espresso": "Espresso",
+  "prep_pourover": "Pourover",
+  "prep_immersion": "Immersion",
+  "prep_cold_brew": "Cold brew",
+  "save": "Save"
 }

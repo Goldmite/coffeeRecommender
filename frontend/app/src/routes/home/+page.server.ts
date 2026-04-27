@@ -14,7 +14,7 @@ export const actions = {
 		}
 
 		const response = await fetch(
-			`${PUBLIC_API_BASE_URL}/recommendation?userId=${locals.userId}&limit=5`,
+			`${PUBLIC_API_BASE_URL}/recommendation?userId=${locals.userId}&limit=10`,
 			{
 				method: 'GET',
 				headers: {

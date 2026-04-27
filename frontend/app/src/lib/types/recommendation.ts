@@ -36,3 +36,7 @@ export interface CoffeeBeanResponse {
 export type Processing = 'WASHED' | 'NATURAL' | 'HONEY' | 'OTHER' | string;
 
 export type RoastLevel = 'LIGHT' | 'MEDIUM_LIGHT' | 'MEDIUM' | 'MEDIUM_DARK' | 'DARK' | string;
+
+export type ExperienceLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT' | string;
+
+export type PrepMethod = 'ESPRESSO' | 'POUROVER' | 'IMMERSION' | 'COLD_BREW' | 'OTHER' | string;

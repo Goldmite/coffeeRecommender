@@ -44,7 +44,7 @@
 	}
 	.headers {
 		background-color: var(--color-main-mid);
-		border-bottom: 1px solid var(--color-main-border);
+		border: 1px solid var(--color-main-border);
 	}
 	th {
 		padding: 8px;

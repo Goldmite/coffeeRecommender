@@ -40,5 +40,35 @@
 	"body": "Kūnas",
 	"aftertaste": "Poskonis",
 	"sweetness": "Saldumas",
-	"bitterness": "Kartumas"
+	"bitterness": "Kartumas",
+	"coffee_beans_for_you": "Kavos pupelės jums",
+	"recommendation_count": [
+		{
+			"declarations": [
+				"input count",
+				"local countPlural = count: plural"
+			],
+			"selectors": [
+				"countPlural"
+			],
+			"match": {
+				"countPlural=one": "Rasta {count} rekomendacija",
+				"countPlural=few": "Rastos {count} rekomendacijos",
+				"countPlural=other": "Rasta {count} rekomendacijų"
+			}
+		}
+	],
+	"other": "Kita",
+	"onboarding_title": "Kaip ruošiate kavą?",
+	"xp_level": "Patirties lygis",
+	"xp_beginner": "Pradedantysis",
+	"xp_intermediate": "Mėgėjas",
+	"xp_advanced": "Pažengęs",
+	"xp_expert": "Ekspertas",
+	"prep_method": "Ruošimo būdas",
+	"prep_espresso": "„Espresso“",
+	"prep_pourover": "Filtruota",
+	"prep_immersion": "Užpilama",
+	"prep_cold_brew": "„Cold Brew“",
+	"save": "Išsaugoti"
 }
