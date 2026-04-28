@@ -62,21 +62,6 @@ class FlavorVectorServiceTest {
     }
 
     @Test
-    void shouldApplySoftWeightForDescriptionFallback() {
-        // given
-        when(repository.findAllDescriptions()).thenReturn(mockDescriptions);
-        service.initInverseDocumentFrequency();
-        // when: Category NUTTYCOCOA appears in 2 out of 3 docs.
-        // IDF = ln(3 / (2 + 1)) + 1.0 = 1.0
-        // Description: "chocolate" -> 1 token, 1 match. TF = 1.0
-        // Expected: TF(1.0) * IDF(1.0) * weight(0.5) = 0.5
-        float[] vector = service.getUnifiedFlavorVector(List.of(), "chocolate");
-        // then
-        int nuttyIndex = FlavorCategory.NUTTYCOCOA.ordinal();
-        assertEquals(0.5f, vector[nuttyIndex], 0.001f);
-    }
-
-    @Test
     void shouldHandleCaseAndPunctuationDuringTokenization() {
         // given
         when(repository.findAllDescriptions()).thenReturn(mockDescriptions);

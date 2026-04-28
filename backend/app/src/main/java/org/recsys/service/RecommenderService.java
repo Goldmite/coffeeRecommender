@@ -10,10 +10,12 @@ import java.util.stream.Collectors;
 
 import org.recsys.config.HybridConfig;
 import org.recsys.dto.recommendation.Candidate;
+import org.recsys.dto.recommendation.FeatureFilterRequest;
 import org.recsys.dto.recommendation.RecommendationDto;
 import org.recsys.dto.recommendation.SimilarCoffees;
 import org.recsys.dto.recommendation.TrainedModel;
 import org.recsys.mapper.CoffeeMapper;
+import org.recsys.mapper.WeightMapper;
 import org.recsys.model.CoffeeBean;
 import org.recsys.repository.CoffeeRepository;
 import org.recsys.repository.UserInteractionsRepository;
@@ -32,13 +34,20 @@ public class RecommenderService {
     private final UserInteractionsRepository interactionsRepository;
     private final HybridConfig config;
     private final CoffeeMapper mapper;
+    private final WeightMapper weightMapper;
 
-    public List<RecommendationDto> getHybridRecommendations(Long userId, int limit) {
+    public List<RecommendationDto> getHybridRecommendations(Long userId, int limit,
+            FeatureFilterRequest filterRequest) {
+        Map<Integer, Float> featureFilters = weightMapper.toFilterMap(filterRequest);
         int candidateLimit = Math.min(Math.max(limit * 15, 50), 150); // 15x display limit in range [50-150]
         List<Candidate> cfCandidates = getCFCandidates(userId, candidateLimit);
-        List<Candidate> cbfCandidates = getCBFCandidates(userId, candidateLimit);
+        List<Candidate> cbfCandidates = getCBFCandidates(userId, candidateLimit, featureFilters);
 
         float cfWeight = determineCfWeight(userId);
+        // intent-based (filters applied) lean more on CBF
+        if (featureFilters != null && !featureFilters.isEmpty()) {
+            cfWeight *= 0.3f; // reduce CF influence by 70%
+        }
         float cbfWeight = 1 - cfWeight;
         Map<Long, Float> hybridScores = new HashMap<>();
         // add CF results
@@ -72,10 +81,10 @@ public class RecommenderService {
     }
 
     // Find Top N candidates by target - user coffee preference vector
-    public List<Candidate> getCBFCandidates(Long userId, int n) {
+    public List<Candidate> getCBFCandidates(Long userId, int n, Map<Integer, Float> sessionFilters) {
         float[] userProfile = preferencesService.getUserPreferenceFlavorProfile(userId);
 
-        float[] target = prepareTargetVector(userProfile, null);
+        float[] target = prepareTargetVector(userProfile, sessionFilters);
 
         List<SimilarCoffees> coffees = coffeeRepository.findTopSimilarCoffeeCandidates(target, n);
 
