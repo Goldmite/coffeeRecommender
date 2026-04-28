@@ -69,5 +69,19 @@
   "prep_pourover": "Pourover",
   "prep_immersion": "Immersion",
   "prep_cold_brew": "Cold brew",
-  "save": "Save"
+  "save": "Save",
+  "filters": "Filters",
+  "open": "Open",
+  "close": "Close",
+  "reset": "Reset",
+  "flavor_fruity": "Fruity",
+  "flavor_floral": "Floral",
+  "flavor_sweet": "Sweet",
+  "flavor_nutty_cocoa": "Nutty/Cocoa",
+  "flavor_spices": "Spices",
+  "flavor_sour": "Sour",
+  "flavor_vegetal": "Vegetal",
+  "origin_type": "Origin Type",
+  "single_origin": "Single Origin",
+  "blend_origin": "Blend"
 }

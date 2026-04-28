@@ -71,5 +71,19 @@
 	"prep_immersion": "Užpilama",
 	"prep_cold_brew": "„Cold Brew“",
 	"save": "Išsaugoti",
-	"shops": "Parduotuvės"
+	"shops": "Parduotuvės",
+	"filters": "Filtrai",
+	"open": "Atidaryti",
+	"close": "Uždaryti",
+	"reset": "Atstatyti",
+	"flavor_fruity": "Vaisinis",
+	"flavor_floral": "Gėlių",
+	"flavor_sweet": "Saldu",
+	"flavor_nutty_cocoa": "Riešutų/kakavos",
+	"flavor_spices": "Prieskoniai",
+	"flavor_sour": "Rūgštus",
+	"flavor_vegetal": "Augalinis",
+	"single_origin": "Viena kilmė",
+	"blend_origin": "Mišinys",
+	"origin_type": "Kilmės tipas"
 }

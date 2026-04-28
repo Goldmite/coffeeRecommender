@@ -45,6 +45,7 @@
 	}
 	h3 {
 		font-size: var(--text-xl);
+		font-weight: var(--font-weight-semibold);
 	}
 	h4 {
 		font-size: var(--text-lg);

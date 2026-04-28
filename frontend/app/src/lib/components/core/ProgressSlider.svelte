@@ -1,17 +1,17 @@
 <script lang="ts">
-	let { value = $bindable(0), max = 5 } = $props();
+	let { formId = undefined, name = undefined, value = $bindable(0), max = 5, min = 1 } = $props();
 
-	const percentage = $derived((value / max) * 100);
+	const percentage = $derived(((value - min) / (max - min)) * 100);
 </script>
 
-<div class="slider-wrapper flex h-8 items-center">
+<div class="slider-wrapper flex h-6 items-center">
 	<div
 		class="visual-track bean-border bg-main-light h-3 w-full overflow-hidden border border-main-border"
 	>
 		<div class="fill h-full bg-main-mid px-1" style="width: {percentage}%"></div>
 	</div>
 
-	<input type="range" min="0" {max} step="1" bind:value class="coffee-slider" />
+	<input form={formId} {name} type="range" {min} {max} step="1" bind:value class="coffee-slider" />
 </div>
 
 <style>
