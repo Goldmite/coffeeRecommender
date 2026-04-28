@@ -5,9 +5,10 @@
 	import GenerateButton from '$lib/components/core/SubmitButton.svelte';
 	import DetailsModalContent from '$lib/components/DetailsModalContent.svelte';
 	import RecommendationList from '$lib/components/RecommendationList.svelte';
+	import ShopSelection from '$lib/components/ShopSelection.svelte';
 	import TasteOnboarding from '$lib/components/TasteOnboarding.svelte';
 	import { m } from '$lib/paraglide/messages.js';
-	import type { RecommendationDto } from '$lib/types/recommendation';
+	import type { RecommendationDto, ShopResponse } from '$lib/types/recommendation';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -23,6 +24,9 @@
 		selectedCoffee = rec;
 		modalRef.open();
 	}
+
+	const shops: ShopResponse[] = $derived(data.shopList);
+	const lastUsedShops = $derived(form?.shopIds ? form.shopIds.map((id) => Number(id)) : []);
 </script>
 
 <div class="flex flex-col">
@@ -42,6 +46,7 @@
 				}}
 			>
 				{#if isOnboarded}
+					<ShopSelection {shops} lastSelectedIds={lastUsedShops} />
 					<GenerateButton disabled={loading}>
 						{#if loading}
 							<span class="icon-[svg-spinners--180-ring]"></span>

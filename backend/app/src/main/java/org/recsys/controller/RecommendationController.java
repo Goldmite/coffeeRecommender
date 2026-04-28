@@ -2,11 +2,11 @@ package org.recsys.controller;
 
 import java.util.List;
 
-import org.recsys.dto.recommendation.FeatureFilterRequest;
 import org.recsys.dto.recommendation.RecommendationDto;
+import org.recsys.dto.recommendation.RecommendationFilterRequest;
 import org.recsys.service.RecommenderService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,9 +21,10 @@ public class RecommendationController {
 
     private final RecommenderService service;
 
-    @GetMapping
+    @PostMapping
     public ResponseEntity<List<RecommendationDto>> getHybridRecommendations(@RequestParam Long userId,
-            @RequestParam(defaultValue = "10") int limit, @RequestBody(required = false) FeatureFilterRequest filters) {
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestBody RecommendationFilterRequest filters) {
         return ResponseEntity.ok(service.getHybridRecommendations(userId, limit, filters));
     }
 

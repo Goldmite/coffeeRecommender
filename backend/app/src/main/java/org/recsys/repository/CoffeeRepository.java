@@ -17,21 +17,17 @@ public interface CoffeeRepository extends JpaRepository<CoffeeBean, Long> {
         @Query("SELECT f.description FROM CoffeeBean c JOIN c.features f")
         List<String> findAllDescriptions();
 
-        @Query("SELECT id FROM CoffeeBean")
-        List<Long> findAllIds();
-
-        @Query(value = "SELECT * FROM coffee_beans c " +
-                        "JOIN coffee_features f ON c.id = f.coffee_id " +
-                        "ORDER BY f.flavor_vector <=> cast(:vector as vector) " +
-                        "LIMIT :n", nativeQuery = true)
-        List<CoffeeBean> findTopNSimilarBeansByVector(@Param("vector") float[] vector, @Param("n") int n);
+        @Query("SELECT c.id FROM CoffeeBean c WHERE (:shopIds IS NULL OR c.shop.id IN :shopIds)")
+        List<Long> findAllIdsInShops(@Param("shopIds") Iterable<Integer> shopIds);
 
         @Query(value = """
                         SELECT c.id, (f.flavor_vector <=> cast(:vector as vector)) as distance
                         FROM coffee_beans c
                         JOIN coffee_features f ON c.id = f.coffee_id
+                        WHERE (:shopIds IS NULL OR c.shop_id IN :shopIds)
                         ORDER BY distance
                         LIMIT :n
                         """, nativeQuery = true)
-        List<SimilarCoffees> findTopSimilarCoffeeCandidates(@Param("vector") float[] vector, @Param("n") int n);
+        List<SimilarCoffees> findTopSimilarCoffeeCandidates(@Param("vector") float[] vector, @Param("n") int n,
+                        @Param("shopIds") Iterable<Integer> shopIds);
 }
