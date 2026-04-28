@@ -20,10 +20,27 @@ app:
     expiration: 86400000 # 24 hours
   testdata:
     seed: 22
-  weights:
-    soft-features: 0.8
 
 recommendation:
+  weights:
+    roast-level: 1.0
+    sca-score: 1.5
+    altitude: 1.0
+    acidity: 1.4
+    body: 1.0
+    aftertaste: 1.0
+    sweetness: 1.2
+    bitterness: 1.0
+    single-origin: 1.1
+    fruity: 2.0
+    floral: 2.0
+    nutty-cocoa: 1.5
+    sweet: 2.0
+    spices: 1.5
+    vegetal: 1.0
+    sour: 1.0
+    processing: 1.0
+    origins: 1.0
   mf:
     latent-factors: 50
     learning-rate: 0.015
