@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 import org.recsys.config.HybridConfig;
 import org.recsys.dto.recommendation.Candidate;
-import org.recsys.dto.recommendation.FeatureFilterRequest;
 import org.recsys.dto.recommendation.RecommendationDto;
+import org.recsys.dto.recommendation.RecommendationFilterRequest;
 import org.recsys.dto.recommendation.SimilarCoffees;
 import org.recsys.dto.recommendation.TrainedModel;
 import org.recsys.mapper.CoffeeMapper;
@@ -37,18 +37,21 @@ public class RecommenderService {
     private final WeightMapper weightMapper;
 
     public List<RecommendationDto> getHybridRecommendations(Long userId, int limit,
-            FeatureFilterRequest filterRequest) {
-        Map<Integer, Float> featureFilters = weightMapper.toFilterMap(filterRequest);
-        int candidateLimit = Math.min(Math.max(limit * 15, 50), 150); // 15x display limit in range [50-150]
-        List<Candidate> cfCandidates = getCFCandidates(userId, candidateLimit);
-        List<Candidate> cbfCandidates = getCBFCandidates(userId, candidateLimit, featureFilters);
+            RecommendationFilterRequest filterRequest) {
 
+        Map<Integer, Float> featureFilters = weightMapper.toFilterMap(filterRequest.featureFilter());
         float cfWeight = determineCfWeight(userId);
         // intent-based (filters applied) lean more on CBF
         if (featureFilters != null && !featureFilters.isEmpty()) {
             cfWeight *= 0.3f; // reduce CF influence by 70%
         }
         float cbfWeight = 1 - cfWeight;
+
+        int candidateLimit = Math.min(Math.max(limit * 15, 50), 150); // 15x display limit in range [50-150]
+        List<Candidate> cfCandidates = getCFCandidates(userId, candidateLimit, filterRequest.shopIds());
+        List<Candidate> cbfCandidates = getCBFCandidates(userId, candidateLimit, filterRequest.shopIds(),
+                featureFilters);
+
         Map<Long, Float> hybridScores = new HashMap<>();
         // add CF results
         for (Candidate cf : cfCandidates) {
@@ -81,22 +84,23 @@ public class RecommenderService {
     }
 
     // Find Top N candidates by target - user coffee preference vector
-    public List<Candidate> getCBFCandidates(Long userId, int n, Map<Integer, Float> sessionFilters) {
+    public List<Candidate> getCBFCandidates(Long userId, int n, List<Integer> shopIds,
+            Map<Integer, Float> sessionFilters) {
         float[] userProfile = preferencesService.getUserPreferenceFlavorProfile(userId);
 
         float[] target = prepareTargetVector(userProfile, sessionFilters);
 
-        List<SimilarCoffees> coffees = coffeeRepository.findTopSimilarCoffeeCandidates(target, n);
+        List<SimilarCoffees> coffees = coffeeRepository.findTopSimilarCoffeeCandidates(target, n, shopIds);
 
         return coffees.stream().map(c -> new Candidate(c.getId(), c.getSimilarityScore().floatValue(), "CBF")).toList();
     }
 
-    public List<Candidate> getCFCandidates(Long userId, int n) {
+    public List<Candidate> getCFCandidates(Long userId, int n, List<Integer> shopIds) {
         TrainedModel model = provider.getCurrentModel().orElseThrow(() -> new RuntimeException());
 
         long now = Instant.now().getEpochSecond();
 
-        List<Long> candidateIds = coffeeRepository.findAllIds();
+        List<Long> candidateIds = coffeeRepository.findAllIdsInShops(shopIds);
         return candidateIds.stream()
                 .map(coffeeId -> {
                     float score = model.predict(userId, coffeeId, now);
