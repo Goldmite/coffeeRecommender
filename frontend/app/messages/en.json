@@ -83,5 +83,10 @@
   "flavor_vegetal": "Vegetal",
   "origin_type": "Origin Type",
   "single_origin": "Single Origin",
-  "blend_origin": "Blend"
+  "blend_origin": "Blend",
+  "low": "Low",
+  "lower": "Lower",
+  "standard": "Standard",
+  "higher": "Higher",
+  "high": "High"
 }

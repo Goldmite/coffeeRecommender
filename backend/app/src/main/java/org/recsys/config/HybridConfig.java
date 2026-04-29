@@ -18,4 +18,6 @@ public class HybridConfig {
     // number of interactions for a user where the cf weight is exactly half of the
     // max cf weight
     private int inflectionPoint = 10;
+    // Sensitivity to filters (user-intent)
+    private float sensitivity = 0.25f;
 }

@@ -121,10 +121,13 @@ public class RecommenderService {
         Map<Integer, Float> filters = (sessionFilters != null) ? sessionFilters : Collections.emptyMap();
 
         for (int i = 0; i < dim; i++) {
-            // use filter override if present, otherwise use config weight
-            float weight = filters.getOrDefault(i, baseWeights[i]);
+            // use filter to relatively increase/decrease base weights
+            float multiplier = 1.0f + (filters.getOrDefault(i, 3.0f) - 3.0f) * config.getSensitivity();
+            float weight = baseWeights[i] * multiplier;
+            // when filters are used, ensure they have an effect (mainly for flavor)
+            float userWeight = multiplier != 1.0f && userProfile[i] == 0.0f ? 0.5f : userProfile[i];
             // apply weight to user profile
-            targetVector[i] = userProfile[i] * weight;
+            targetVector[i] = userWeight * weight;
 
             magnitudeSq += targetVector[i] * targetVector[i];
         }

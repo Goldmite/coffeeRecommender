@@ -51,3 +51,4 @@ recommendation:
     cf: 0.8
     steepness: 0.4
     inflection-point: 10
+    sensitivity: 0.5

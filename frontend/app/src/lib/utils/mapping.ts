@@ -66,3 +66,11 @@ export const flavorCategoryMap: Record<string, string> = {
 	SOUR: m.flavor_sour(),
 	VEGETAL: m.flavor_vegetal(),
 };
+
+export const intensityMap: Record<number, string> = {
+	1: m.low(),
+	2: m.lower(),
+	3: m.standard(),
+	4: m.higher(),
+	5: m.high(),
+};

@@ -26,7 +26,7 @@
 		type="checkbox"
 		class="hidden"
 		checked={isChecked}
-		{onchange}
+		onchange={onchange !== undefined ? (e) => onchange(e.currentTarget.checked) : undefined}
 	/>
 
 	<span>{labelText}</span>
