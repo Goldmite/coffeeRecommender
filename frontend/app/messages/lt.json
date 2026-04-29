@@ -90,5 +90,10 @@
 	"lower": "Žemesnis",
 	"standard": "Standartinis",
 	"higher": "Aukštesnis",
-	"high": "Aukštas"
+	"high": "Aukštas",
+	"even_lighter": "Dar šviesesnis",
+	"lighter": "Šviesesnis",
+	"current": "Dabartinis",
+	"darker": "Tamsesnis",
+	"even_darker": "Dar tamsesnis"
 }

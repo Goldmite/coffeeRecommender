@@ -4,6 +4,12 @@
 	import Progress from './core/Progress.svelte';
 
 	let { details } = $props();
+
+	const altitudeDisplay = $derived(
+		details.coffee.altitude[0] == details.coffee.altitude[1]
+			? details.coffee.altitude[0]
+			: details.coffee.altitude.join('-'),
+	);
 </script>
 
 {#snippet detailRow(key: string, value: string, extra?: string)}
@@ -20,7 +26,7 @@
 	{@render detailRow(m.origins(), details.coffee.origins.join(', '))}
 	{@render detailRow(m.process(), processMap[details.coffee.process])}
 	{@render detailRow(m.roast(), roastMap[details.coffee.roastLevel])}
-	{@render detailRow(m.altitude(), details.coffee.altitude.join('-'), ' m')}
+	{@render detailRow(m.altitude(), altitudeDisplay, ' m')}
 	{@render detailRow('SCA', details.coffee.scaScore)}
 	{@render detailRow(m.flavor_notes(), details.coffee.flavorNotes.join(', '))}
 	{@render levelRow(m.acidity(), details.coffee.acididty)}

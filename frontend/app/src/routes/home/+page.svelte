@@ -64,7 +64,7 @@
 			</Card>
 		</div>
 		<div class="w-200 space-y-2">
-			<FeatureFilter />
+			{#if isOnboarded}<FeatureFilter />{/if}
 			<Card>
 				<RecommendationList
 					recommendations={form?.recommendations}

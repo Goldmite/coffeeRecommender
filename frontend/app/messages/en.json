@@ -88,5 +88,10 @@
   "lower": "Lower",
   "standard": "Standard",
   "higher": "Higher",
-  "high": "High"
+  "high": "High",
+  "even_lighter": "Even Lighter",
+  "lighter": "Lighter",
+  "current": "Current",
+  "darker": "Darker",
+  "even_darker": "Even Darker"
 }

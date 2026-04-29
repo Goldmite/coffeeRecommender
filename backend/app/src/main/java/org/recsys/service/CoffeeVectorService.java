@@ -49,7 +49,7 @@ public class CoffeeVectorService {
     }
 
     private float[] normalizeSimpleAttributes(CoffeeVectorizationDto dto) {
-        float nRoast = normalize(dto.getRoastLevel(), 0, 4);
+        float nRoast = normalize(dto.getRoastLevel() + 1, 0, 5);
         float nAltitude = normalize((dto.getAltitude().lower() + dto.getAltitude().upper()) / 2.0f, 1000, 2501);
         float nScaScore = normalize(dto.getScaScore(), 80, 100);
         float nAcidity = normalize(dto.getAcidity(), 1, 10);

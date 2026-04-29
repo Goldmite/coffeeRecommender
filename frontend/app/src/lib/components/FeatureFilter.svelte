@@ -23,7 +23,7 @@
 
 	function toLabel(index: number, key: string) {
 		if (key == 'roast') {
-			return roastMap[levelToRoast[index]];
+			return levelToRoast[index];
 		} else {
 			return intensityMap[index];
 		}

@@ -28,9 +28,13 @@ export const roastToLevel: Record<string, number> = {
 	DARK: 5,
 };
 
-export const levelToRoast: Record<number, string> = Object.fromEntries(
-	Object.entries(roastToLevel).map(([key, val]) => [val, key]),
-);
+export const levelToRoast: Record<number, string> = {
+	1: m.even_lighter(),
+	2: m.lighter(),
+	3: m.current(),
+	4: m.darker(),
+	5: m.even_darker(),
+};
 
 export const experienceMap: Record<ExperienceLevel, { value: number; label: string }> = {
 	BEGINNER: { value: 1, label: m.xp_beginner() },
