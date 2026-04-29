@@ -63,8 +63,8 @@ class CoffeeVectorServiceTest {
         // when
         float[] result = coffeeVectorService.createFlavorVector(baseDto);
         // then: First 9 elements are simple attributes
-        // Roast: (3-1)/(5-1) = 0.5
-        assertEquals(0.5f, result[0], 0.001f);
+        // Roast: 3/5 = 0.6
+        assertEquals(0.6f, result[0], 0.001f);
         // Altitude: (1750.5-1000)/(2501-1000) = 750.5/1501 = 0.5
         assertEquals(0.5f, result[1], 0.001f);
         // Single Origin boolean
@@ -91,13 +91,13 @@ class CoffeeVectorServiceTest {
     void shouldHandleOutOfBoundsValuesByClamping() {
         // given
         baseDto.setScaScore(110); // Above max 100
-        baseDto.setRoastLevel(0); // Below min 1
+        baseDto.setAcidity(11); // Above max 10
         when(flavorVectorService.getUnifiedFlavorVector(any(), any())).thenReturn(new float[0]);
         // when
         float[] result = coffeeVectorService.createFlavorVector(baseDto);
         // then
         assertEquals(1.0f, result[2], "SCA Score should be clamped to 1.0");
-        assertEquals(0.0f, result[0], "Roast Level should be clamped to 0.0");
+        assertEquals(1.0f, result[3], "Acidity should be clamped to 1.0");
     }
 
     @Test
