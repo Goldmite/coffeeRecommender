@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.recsys.config.HybridConfig;
@@ -96,14 +97,16 @@ public class RecommenderService {
     }
 
     public List<Candidate> getCFCandidates(Long userId, int n, List<Integer> shopIds) {
-        TrainedModel model = provider.getCurrentModel().orElseThrow(() -> new RuntimeException());
+        Optional<TrainedModel> model = provider.getCurrentModel();
+        if (model.isEmpty())
+            return List.of();
 
         long now = Instant.now().getEpochSecond();
 
         List<Long> candidateIds = coffeeRepository.findAllIdsInShops(shopIds);
         return candidateIds.stream()
                 .map(coffeeId -> {
-                    float score = model.predict(userId, coffeeId, now);
+                    float score = model.get().predict(userId, coffeeId, now);
                     float nScore = score / 5.0f; // normalize
                     return new Candidate(coffeeId, nScore, "CF");
                 })

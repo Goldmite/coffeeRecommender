@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.recsys.config.MatrixFactorizationConfig;
 import org.recsys.dto.recommendation.PreparedTrainingData;
@@ -28,8 +29,10 @@ public class TrainingDataService {
         return interactionRepository.findAll();
     }
 
-    public PreparedTrainingData prepareData(boolean shuffled) {
+    public Optional<PreparedTrainingData> prepareData(boolean shuffled) {
         List<UserInteractions> interactions = getAllUserInteractions();
+        if (interactions.isEmpty())
+            return Optional.empty();
 
         IndexMapper userMapper = new IndexMapper();
         IndexMapper coffeeMapper = new IndexMapper();
@@ -78,8 +81,8 @@ public class TrainingDataService {
         if (shuffled)
             Collections.shuffle(triplets);
 
-        return new PreparedTrainingData(triplets, userMapper, coffeeMapper, globalMean, minTimestamp,
-                userTimestampMeans);
+        return Optional.of(new PreparedTrainingData(triplets, userMapper, coffeeMapper, globalMean, minTimestamp,
+                userTimestampMeans));
     }
 
     private float calculateScore(UserInteractions ui) {

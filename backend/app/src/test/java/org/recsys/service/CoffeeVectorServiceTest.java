@@ -63,8 +63,8 @@ class CoffeeVectorServiceTest {
         // when
         float[] result = coffeeVectorService.createFlavorVector(baseDto);
         // then: First 9 elements are simple attributes
-        // Roast: 3/5 = 0.6
-        assertEquals(0.6f, result[0], 0.001f);
+        // Roast: (3-1)/(5-1) = 0.5
+        assertEquals(0.5f, result[0], 0.001f);
         // Altitude: (1750.5-1000)/(2501-1000) = 750.5/1501 = 0.5
         assertEquals(0.5f, result[1], 0.001f);
         // Single Origin boolean

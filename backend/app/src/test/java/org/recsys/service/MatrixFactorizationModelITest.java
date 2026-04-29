@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,10 +80,10 @@ class MatrixFactorizationModelITest {
         @Test
         void modelShouldPredictHigherScoresForLikedCoffees() {
                 // Arrange
-                PreparedTrainingData data = trainingDataService.prepareData(true);
+                Optional<PreparedTrainingData> data = trainingDataService.prepareData(true);
                 // Act: Train with enough epochs to allow convergence
                 // We use a slightly higher epoch count (100) to ensure the error drops
-                TrainingResult result = mfModel.train(data, 0.02f, 0.02f, 25, 50);
+                TrainingResult result = mfModel.train(data.get(), 0.02f, 0.02f, 25, 50);
                 TrainedModel model = result.model();
                 // Assert: Verify the predictions reflect the training data
                 float predictionLike = model.predict(savedUser1.getId(), 10L, now);

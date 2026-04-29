@@ -19,7 +19,7 @@ app:
     secret: ${JWT_SECRET:staticfallbacksecretkeyfordevelopment256bit}
     expiration: 86400000 # 24 hours
   testdata:
-    seed: 22
+    seed: 0 # 0 for random seeding
 
 recommendation:
   weights:
