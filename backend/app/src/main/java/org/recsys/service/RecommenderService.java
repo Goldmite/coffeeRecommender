@@ -121,13 +121,30 @@ public class RecommenderService {
         Map<Integer, Float> filters = (sessionFilters != null) ? sessionFilters : Collections.emptyMap();
 
         for (int i = 0; i < dim; i++) {
-            // use filter to relatively increase/decrease base weights
-            float multiplier = 1.0f + (filters.getOrDefault(i, 3.0f) - 3.0f) * config.getSensitivity();
-            float weight = baseWeights[i] * multiplier;
-            // when filters are used, ensure they have an effect (mainly for flavor)
-            float userWeight = multiplier != 1.0f && userProfile[i] == 0.0f ? 0.5f : userProfile[i];
-            // apply weight to user profile
-            targetVector[i] = userWeight * weight;
+            float profileVal = userProfile[i];
+            float filterVal = filters.getOrDefault(i, 3.0f);
+            float intentShift = (filterVal - 3.0f) * config.getSensitivity();
+
+            float targetValue;
+
+            if (filterVal == 3.0f) {
+                // Neutral - respect the profile
+                targetValue = profileVal;
+            } else if (i <= 8) {
+                // Simple attributes [0-1] spectrum
+                targetValue = profileVal + intentShift;
+            } else {
+                // Categorical attributes (0 meaning without, therefore when user wants more,
+                // start with base value - 0.2)
+                if (filterVal > 3.0f) {
+                    targetValue = Math.max(0.2f, profileVal) + intentShift;
+                } else {
+                    targetValue = profileVal + intentShift;
+                }
+            }
+            // clamping and applying importance weight
+            targetValue = Math.max(0.0f, Math.min(1.0f, targetValue));
+            targetVector[i] = targetValue * baseWeights[i];
 
             magnitudeSq += targetVector[i] * targetVector[i];
         }

@@ -23,24 +23,24 @@ app:
 
 recommendation:
   weights:
-    roast-level: 1.0
-    sca-score: 1.5
-    altitude: 1.0
-    acidity: 1.4
-    body: 1.0
-    aftertaste: 1.0
+    roast-level: 2.0
+    sca-score: 1.1
+    altitude: 0.6
+    acidity: 1.8
+    body: 1.2
+    aftertaste: 1.2
     sweetness: 1.2
     bitterness: 1.0
     single-origin: 1.1
     fruity: 2.0
     floral: 2.0
-    nutty-cocoa: 1.5
+    nutty-cocoa: 2.0
     sweet: 2.0
     spices: 1.5
-    vegetal: 1.0
-    sour: 1.0
+    vegetal: 1.4
+    sour: 1.4
     processing: 1.0
-    origins: 1.0
+    origins: 0.5
   mf:
     latent-factors: 50
     learning-rate: 0.015
@@ -51,4 +51,4 @@ recommendation:
     cf: 0.8
     steepness: 0.4
     inflection-point: 10
-    sensitivity: 0.5
+    sensitivity: 0.3
