@@ -43,6 +43,7 @@
   "no_recommendations_generated": "No recommendations generated",
   "get_recommendations": "Get Recommendations",
   "coffee_beans_for_you": "Coffee beans for you",
+  "coffee_beans_purchased": "Purchased Coffees",
   "recommendation_count": [
     {
       "declarations": [
@@ -95,5 +96,7 @@
   "darker": "Darker",
   "even_darker": "Even Darker",
   "purchase_query": "Did you purchase this coffee?",
-  "yes": "Yes"
+  "yes": "Yes",
+  "recommendations": "Recommendations",
+  "purchases": "Purchases"
 }

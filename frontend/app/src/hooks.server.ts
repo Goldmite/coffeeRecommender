@@ -1,6 +1,6 @@
 import { redirect, type Handle } from '@sveltejs/kit';
 import { paraglideMiddleware } from '$lib/paraglide/server';
-import { getTextDirection } from '$lib/paraglide/runtime';
+import { deLocalizeHref, getTextDirection, localizeHref } from '$lib/paraglide/runtime';
 import { sequence } from '@sveltejs/kit/hooks';
 
 const paraglideHandle: Handle = ({ event, resolve }) =>
@@ -12,6 +12,9 @@ const paraglideHandle: Handle = ({ event, resolve }) =>
 			},
 		});
 	});
+
+const AUTH_ROUTES = new Set(['/login', '/signup']);
+const PROTECTED_ROUTES = new Set(['/home', '/profile', '/purchases']);
 
 const authHandle: Handle = async ({ event, resolve }) => {
 	const token = event.cookies.get('jwt');
@@ -31,24 +34,19 @@ const authHandle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
-	const pathSegments = event.url.pathname.split('/').filter(Boolean);
-
-	const isLangPrefix = pathSegments[0]?.length === 2;
-	const rootPath = isLangPrefix ? pathSegments[1] : pathSegments[0];
+	const rootPath = deLocalizeHref(event.url.pathname);
 
 	const isLoggedIn = !!event.locals.userId;
 
-	const isAuthPage = rootPath === 'login' || rootPath === 'signup';
-	const isProtectedRoute = rootPath === 'home' || rootPath === 'profile' || 'purchases';
+	const isAuthPage = AUTH_ROUTES.has(rootPath);
+	const isProtectedRoute = PROTECTED_ROUTES.has(rootPath);
 
 	if (!isLoggedIn && isProtectedRoute) {
-		const lang = isLangPrefix ? `/${pathSegments[0]}` : '';
-		throw redirect(303, `${lang}/login`);
+		throw redirect(303, localizeHref('/login'));
 	}
 
 	if (isLoggedIn && isAuthPage) {
-		const lang = isLangPrefix ? `/${pathSegments[0]}` : '';
-		throw redirect(303, `${lang}/home`);
+		throw redirect(303, localizeHref('/home'));
 	}
 
 	return resolve(event);

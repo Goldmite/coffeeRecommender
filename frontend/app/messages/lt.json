@@ -95,5 +95,10 @@
 	"lighter": "Šviesesnis",
 	"current": "Dabartinis",
 	"darker": "Tamsesnis",
-	"even_darker": "Dar tamsesnis"
+	"even_darker": "Dar tamsesnis",
+	"coffee_beans_purchased": "Jūsų įsigytos kavos pupelės",
+	"purchase_query": "Ar pirkote šią kavą?",
+	"yes": "Taip",
+	"recommendations": "Rekomendacijos",
+	"purchases": "Pirkimai"
 }
