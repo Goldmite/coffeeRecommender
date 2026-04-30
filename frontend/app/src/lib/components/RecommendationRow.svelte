@@ -38,7 +38,7 @@
 		{rec.coffee.shop.name}
 	</td>
 	<td>
-		<span>{(rec.score * 100).toFixed(0)}%</span>
+		<span>{(rec.score * 100).toFixed(2)}%</span>
 	</td>
 	<td>
 		<div class="flex flex-row items-center justify-between gap-4">

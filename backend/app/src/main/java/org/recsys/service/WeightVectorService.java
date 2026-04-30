@@ -46,4 +46,32 @@ public class WeightVectorService {
 
         return weights;
     }
+
+    public float[] applyFeatureWeights(float[] rawVector, float[] featureWeights) {
+        for (int i = 0; i < rawVector.length; i++) {
+            rawVector[i] *= featureWeights[i];
+        }
+        return rawVector;
+    }
+
+    // normalize after applying weights
+    public float[] l2Normalize(float[] vector) {
+        float sum = 0f;
+
+        for (float v : vector) {
+            sum += v * v;
+        }
+        float norm = (float) Math.sqrt(sum);
+
+        if (norm == 0f) {
+            return vector;
+        }
+
+        float[] result = new float[vector.length];
+        for (int i = 0; i < vector.length; i++) {
+            result[i] = vector[i] / norm;
+        }
+
+        return result;
+    }
 }

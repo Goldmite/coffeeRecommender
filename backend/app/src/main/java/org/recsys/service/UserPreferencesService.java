@@ -145,16 +145,9 @@ public class UserPreferencesService {
                 .build();
 
         float[] adjustedVector = vectorService.createFlavorVector(dto);
-        // set middle ground for null values
-        adjustedVector[8] = 0.5f; // origin type (single/blend)
-        // origins [13-22]
-        for (int originIdx = 13; originIdx <= 22; originIdx++) {
-            adjustedVector[originIdx] = 0.5f;
-        }
-        // flavors [23-29]
-        for (int flavorIdx = 23; flavorIdx <= 29; flavorIdx++) {
-            adjustedVector[flavorIdx] = 0.5f;
-        }
+
+        adjustedVector[8] = 0; // origin type (single/blend)
+
         return adjustedVector;
     }
 

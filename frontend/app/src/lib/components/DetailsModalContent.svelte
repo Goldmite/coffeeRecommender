@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages';
+	import type { CoffeeBeanResponse } from '$lib/types/recommendation';
 	import { processMap, roastMap } from '$lib/utils/mapping';
 	import Progress from './core/Progress.svelte';
 
-	let { details } = $props();
+	let { details }: { details: CoffeeBeanResponse } = $props();
 
 	const altitudeDisplay = $derived(
-		details.coffee.altitude[0] == details.coffee.altitude[1]
-			? details.coffee.altitude[0]
-			: details.coffee.altitude.join('-'),
+		details.altitude[0] == details.altitude[1]
+			? details.altitude[0].toString()
+			: details.altitude.join('-'),
 	);
 </script>
 
@@ -17,28 +18,28 @@
 	<dd>{value ?? '—'}{extra}</dd>
 {/snippet}
 
-{#snippet levelRow(key: string, value: number)}
+{#snippet levelRow(key: string, value: number | null)}
 	<dt>{key}</dt>
 	<dd><Progress {value} max={10}></Progress></dd>
 {/snippet}
 
 <dl class="mb-5 grid grid-cols-2 gap-3">
-	{@render detailRow(m.origins(), details.coffee.origins.join(', '))}
-	{@render detailRow(m.process(), processMap[details.coffee.process])}
-	{@render detailRow(m.roast(), roastMap[details.coffee.roastLevel])}
+	{@render detailRow(m.origins(), details.origins.join(', '))}
+	{@render detailRow(m.process(), processMap[details.process])}
+	{@render detailRow(m.roast(), roastMap[details.roastLevel])}
 	{@render detailRow(m.altitude(), altitudeDisplay, ' m')}
-	{@render detailRow('SCA', details.coffee.scaScore)}
-	{@render detailRow(m.flavor_notes(), details.coffee.flavorNotes.join(', '))}
-	{@render levelRow(m.acidity(), details.coffee.acididty)}
-	{@render levelRow(m.body(), details.coffee.body)}
-	{@render levelRow(m.aftertaste(), details.coffee.aftertaste)}
-	{@render levelRow(m.sweetness(), details.coffee.sweetness)}
-	{@render levelRow(m.bitterness(), details.coffee.bitterness)}
+	{@render detailRow('SCA', details.scaScore?.toString() ?? '')}
+	{@render detailRow(m.flavor_notes(), details.flavorNotes.join(', '))}
+	{@render levelRow(m.acidity(), details.acidity)}
+	{@render levelRow(m.body(), details.body)}
+	{@render levelRow(m.aftertaste(), details.aftertaste)}
+	{@render levelRow(m.sweetness(), details.sweetness)}
+	{@render levelRow(m.bitterness(), details.bitterness)}
 </dl>
 
 <section class="mb-5">
 	<h4 class="key">{m.description()}</h4>
-	<p>{details.coffee.description}</p>
+	<p>{details.description}</p>
 </section>
 
 <style>

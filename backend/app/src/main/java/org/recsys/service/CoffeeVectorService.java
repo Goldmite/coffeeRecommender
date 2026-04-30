@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class CoffeeVectorService {
 
     private final FlavorVectorService flavorVectorService;
+    private final WeightVectorService weightVectorService;
 
     private static final List<String> ORIGINS = List.of("Brazil", "Colombia", "Ethiopia", "Peru", "Kenya", "Nicaragua",
             "Guatemala", "Indonesia", "India", "Other");
@@ -36,7 +37,7 @@ public class CoffeeVectorService {
     }
 
     public float[] createFlavorVector(CoffeeVectorizationDto dto) {
-        // Normalize simple attributes
+        // 1. Normalize simple attributes
         float[] normalizedPart = normalizeSimpleAttributes(dto);
         // Encoding categories (origins, process)
         float[] processPart = multiHotEncode(Collections.singletonList(dto.getProcess()),
@@ -45,7 +46,11 @@ public class CoffeeVectorService {
         // Flavors derived from Notes and fallback to Description derived features
         float[] flavorPart = flavorVectorService.getUnifiedFlavorVector(dto.getFlavorNotes(), dto.getDescription());
         // Combine vectors
-        return combine(normalizedPart, processPart, originPart, flavorPart);
+        float[] combined = combine(normalizedPart, processPart, originPart, flavorPart);
+        // 2. Apply feature weights
+        weightVectorService.applyFeatureWeights(combined, weightVectorService.getBaseWeightVector());
+        // 3. Normalize whole vector
+        return weightVectorService.l2Normalize(combined);
     }
 
     private float[] normalizeSimpleAttributes(CoffeeVectorizationDto dto) {
@@ -58,20 +63,20 @@ public class CoffeeVectorService {
         float nSweetness = normalize(dto.getSweetness(), 1, 10);
         float nBitterness = normalize(dto.getBitterness(), 1, 10);
 
-        float singleOrigin = dto.isSingleOrigin() ? 1.0f : 0.0f;
+        float singleOrigin = dto.isSingleOrigin() ? 1.0f : -1.0f;
 
         return new float[] { nRoast, nAltitude, nScaScore, nAcidity, nBody, nAftertaste, nSweetness, nBitterness,
                 singleOrigin };
     }
 
-    // normalize using min max to range [0, 1]
+    // normalize using min max to range [-1, 1]
     private float normalize(double x, double min, double max) {
         if (Double.compare(min, max) == 0) {
-            return 0.5f;
+            return 0;
         }
-        // min-max with range [0, 1]: (x - min) / (max - min)
-        double normalized = (x - min) / (max - min);
-        normalized = Math.max(0, Math.min(1, normalized)); // precaution for out of bounds
+        // min-max with range [-1, 1]: -1 + ((x - min)(2) / (max - min))
+        double normalized = -1 + (((x - min) * 2) / (max - min));
+        normalized = Math.max(-1, Math.min(1, normalized)); // precaution for out of bounds
         return (float) normalized;
     }
 

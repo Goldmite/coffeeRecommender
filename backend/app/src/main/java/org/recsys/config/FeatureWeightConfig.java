@@ -20,7 +20,7 @@ public class FeatureWeightConfig {
     private float aftertaste = 1.0f;
     private float sweetness = 1.5f;
     private float bitterness = 1.0f;
-    private float singleOrigin = 1.0f;
+    private float singleOrigin = 1.5f;
 
     // Flavor Categories (Highly essential)
     private float fruity = 2.0f;

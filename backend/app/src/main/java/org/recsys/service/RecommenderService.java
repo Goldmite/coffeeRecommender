@@ -117,47 +117,29 @@ public class RecommenderService {
 
     public float[] prepareTargetVector(float[] userProfile, Map<Integer, Float> sessionFilters) {
         int dim = userProfile.length;
-        float[] baseWeights = weightVectorService.getBaseWeightVector();
+        float[] featureWeights = weightVectorService.getBaseWeightVector();
         float[] targetVector = new float[dim];
-        double magnitudeSq = 0;
 
         Map<Integer, Float> filters = (sessionFilters != null) ? sessionFilters : Collections.emptyMap();
 
         for (int i = 0; i < dim; i++) {
-            float profileVal = userProfile[i];
-            float filterVal = filters.getOrDefault(i, 3.0f);
-            float intentShift = (filterVal - 3.0f) * config.getSensitivity();
 
-            float targetValue;
+            float userPref = userProfile[i];
+            float filterPref = filters.getOrDefault(i, 3.0f);
 
-            if (filterVal == 3.0f) {
-                // Neutral - respect the profile
-                targetValue = profileVal;
-            } else if (i <= 8) {
-                // Simple attributes [0-1] spectrum
-                targetValue = profileVal + intentShift;
+            if (filterPref != 3.0f) {
+                // Normalize 1–5 to [-1, 1]
+                float normFilterPref = (filterPref - 3f) / 2f;
+                // combine - prioritizing filter over user pref
+                targetVector[i] = config.getAlpha() * normFilterPref + (1 - config.getAlpha()) * userPref;
             } else {
-                // Categorical attributes (0 meaning without, therefore when user wants more,
-                // start with base value - 0.2)
-                if (filterVal > 3.0f) {
-                    targetValue = Math.max(0.2f, profileVal) + intentShift;
-                } else {
-                    targetValue = profileVal + intentShift;
-                }
+                targetVector[i] = userPref;
             }
-            // clamping and applying importance weight
-            targetValue = Math.max(0.0f, Math.min(1.0f, targetValue));
-            targetVector[i] = targetValue * baseWeights[i];
+        }
 
-            magnitudeSq += targetVector[i] * targetVector[i];
-        }
-        // re-normalize
-        float magnitude = (float) Math.sqrt(magnitudeSq);
-        if (magnitude > 1e-9) {
-            for (int i = 0; i < dim; i++) {
-                targetVector[i] /= magnitude;
-            }
-        }
+        weightVectorService.applyFeatureWeights(targetVector, featureWeights);
+
+        weightVectorService.l2Normalize(targetVector);
 
         return targetVector;
     }

@@ -78,6 +78,6 @@
 
 <DetailsModal bind:this={modalRef} headerTxt={selectedCoffee?.coffee.name}>
 	{#if selectedCoffee}
-		<DetailsModalContent details={selectedCoffee}></DetailsModalContent>
+		<DetailsModalContent details={selectedCoffee.coffee}></DetailsModalContent>
 	{/if}
 </DetailsModal>
