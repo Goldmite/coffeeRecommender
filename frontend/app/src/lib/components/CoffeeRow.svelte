@@ -6,12 +6,14 @@
 	let {
 		coffee,
 		rating,
+		purchaseDate,
 		rowNr,
 		onShowDetails,
 		onRatingClick,
 	}: {
 		coffee: CoffeeBeanResponse;
 		rating?: number;
+		purchaseDate?: string;
 		rowNr: number;
 		onShowDetails: (coffee: CoffeeBeanResponse) => void;
 		onRatingClick: (coffeeId: number) => void;
@@ -44,7 +46,7 @@
 	<td>
 		{coffee.shop.name}
 	</td>
-	<td>
+	<td class="whitespace-nowrap">
 		<button onclick={() => onRatingClick(coffee.id)} title={m.rate()} class="rating">
 			{#each [1, 2, 3, 4, 5] as ratingLevel}
 				{#if rating != undefined && ratingLevel <= rating}
@@ -64,6 +66,9 @@
 				<span class="icon-[streamline--bullet-list-solid]"></span>
 			</button>
 		</div>
+	</td>
+	<td class="text-center text-main-mid">
+		{purchaseDate ? new Date(purchaseDate).toLocaleDateString() : '—'}
 	</td>
 </tr>
 

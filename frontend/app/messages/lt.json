@@ -103,8 +103,9 @@
 	"purchases": "Pirkimai",
 	"rating": "Įvertinimas",
 	"no_purchased_coffees": "Nėra pirktų kavų",
-	"rate": "Įvertinkite",
+	"rate": "Įvertinti",
 	"rate_this_coffee": "Įvertinkite šią kavą!",
 	"previous": "Ankstesnis",
-	"next": "Toliau"
+	"next": "Toliau",
+	"date": "Data"
 }

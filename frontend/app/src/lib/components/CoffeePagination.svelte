@@ -11,8 +11,8 @@
 		onRatingClick,
 	}: {
 		purchases: PurchaseDto[] | undefined;
-		currentPage: number | undefined;
-		totalPages: number | undefined;
+		currentPage: number;
+		totalPages: number;
 		onShowDetails: (coffee: CoffeeBeanResponse) => void;
 		onRatingClick: (coffeeId: number) => void;
 	} = $props();
@@ -28,11 +28,19 @@
 			<th>{m.shop()}</th>
 			<th>{m.rating()}</th>
 			<th>{m.actions()}</th>
+			<th>{m.date()}</th>
 		</tr>
 	</thead>
 	<tbody>
 		{#each purchases as p, i}
-			<CoffeeRow coffee={p.coffee} rating={p.rating} rowNr={i} {onShowDetails} {onRatingClick} />
+			<CoffeeRow
+				coffee={p.coffee}
+				rating={p.rating}
+				purchaseDate={p.purchaseDate}
+				rowNr={i}
+				{onShowDetails}
+				{onRatingClick}
+			/>
 		{:else}
 			<tr
 				><td colspan="7" class="text-center italic p-10 text-lg bg-main-mid/10">
@@ -42,16 +50,16 @@
 		{/each}
 	</tbody>
 </table>
-{#if currentPage != undefined && totalPages != undefined}
+{#if totalPages > 1}
 	<div class="flex flex-row justify-center gap-4 bg-main-mid py-1 text-sm italic">
 		<div class="w-16 text-right">
-			<a href="?page={currentPage - 1}" class:hidden={currentPage === 0}>
+			<a href="?page={currentPage - 1}" class:invisible={currentPage === 0}>
 				{m.previous()}
 			</a>
 		</div>
 		<span>{currentPage + 1} / {totalPages}</span>
 		<div class="w-16 text-left">
-			<a href="?page={currentPage + 1}" class:hidden={currentPage >= totalPages - 1}>
+			<a href="?page={currentPage + 1}" class:invisible={currentPage >= totalPages - 1}>
 				{m.next()}
 			</a>
 		</div>
