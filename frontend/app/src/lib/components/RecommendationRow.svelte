@@ -19,7 +19,7 @@
 	<td>
 		{rec.coffee.name}
 	</td>
-	<td>
+	<td class="whitespace-nowrap">
 		{#each [1, 2, 3, 4, 5] as level}
 			{#if level <= roast}
 				<span class="icon-[streamline--coffee-bean-solid] bg-main-mid"></span>

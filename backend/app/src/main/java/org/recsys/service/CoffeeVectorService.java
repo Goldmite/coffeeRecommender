@@ -55,8 +55,8 @@ public class CoffeeVectorService {
 
     private float[] normalizeSimpleAttributes(CoffeeVectorizationDto dto) {
         float nRoast = normalize(dto.getRoastLevel(), 0, 4);
-        float nAltitude = normalize((dto.getAltitude().lower() + dto.getAltitude().upper()) / 2.0f, 1000, 2501);
-        float nScaScore = normalize(dto.getScaScore(), 80, 100);
+        float nAltitude = normalize((dto.getAltitude().lower() + dto.getAltitude().upper()) / 2.0f, 1000, 2501, 0, 1);
+        float nScaScore = normalize(dto.getScaScore(), 80, 100, 0, 1);
         float nAcidity = normalize(dto.getAcidity(), 1, 10);
         float nBody = normalize(dto.getBody(), 1, 10);
         float nAftertaste = normalize(dto.getAftertaste(), 1, 10);
@@ -69,15 +69,19 @@ public class CoffeeVectorService {
                 singleOrigin };
     }
 
-    // normalize using min max to range [-1, 1]
+    // normalize to [-1, 1]
     private float normalize(double x, double min, double max) {
+        return normalize(x, min, max, -1, 1);
+    }
+
+    // normalize using min max to range [a, b]
+    private float normalize(double x, double min, double max, int a, int b) {
         if (Double.compare(min, max) == 0) {
             return 0;
         }
-        // min-max with range [-1, 1]: -1 + ((x - min)(2) / (max - min))
-        double normalized = -1 + (((x - min) * 2) / (max - min));
-        normalized = Math.max(-1, Math.min(1, normalized)); // precaution for out of bounds
-        return (float) normalized;
+        // min-max with range [a, b]: a + ((x - min)(b - a) / (max - min))
+        double normalized = a + ((x - min) * (b - a)) / (max - min);
+        return (float) Math.max(-1, Math.min(1, normalized)); // precaution for out of bounds
     }
 
     private float[] multiHotEncode(List<String> values, List<String> allValues) {

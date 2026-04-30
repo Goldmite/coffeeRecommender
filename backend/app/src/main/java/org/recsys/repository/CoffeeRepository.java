@@ -21,11 +21,12 @@ public interface CoffeeRepository extends JpaRepository<CoffeeBean, Long> {
         List<Long> findAllIdsInShops(@Param("shopIds") Iterable<Integer> shopIds);
 
         @Query(value = """
-                        SELECT c.id, (f.flavor_vector <=> cast(:vector as vector)) as distance
+                        SELECT c.id, 1 - (f.flavor_vector <=> cast(:vector as vector)) as similarity
                         FROM coffee_beans c
                         JOIN coffee_features f ON c.id = f.coffee_id
-                        WHERE (:shopIds IS NULL OR c.shop_id IN :shopIds)
-                        ORDER BY distance
+                        WHERE f.flavor_vector IS NOT NULL
+                        AND (:shopIds IS NULL OR c.shop_id IN :shopIds)
+                        ORDER BY similarity DESC
                         LIMIT :n
                         """, nativeQuery = true)
         List<SimilarCoffees> findTopSimilarCoffeeCandidates(@Param("vector") float[] vector, @Param("n") int n,
