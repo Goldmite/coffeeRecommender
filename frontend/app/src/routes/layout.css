@@ -21,6 +21,7 @@
 
 	--color-error: #a8524d;
 	--color-success: #4c9e51;
+	--color-attention: #c4a44d;
 
 	--inset-shadow-md: inset 2px 5px 4px var(--color-taupe-700);
 }

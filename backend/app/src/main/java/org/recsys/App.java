@@ -6,18 +6,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.flywaydb.core.Flyway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 import javax.sql.DataSource;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-/**
- * The main entry point for the layered application.
- * This class typically initializes the application context and starts the
- * server.
- */
 @SpringBootApplication
 @EnableJpaAuditing
+@EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
 public class App {
 
   @Bean

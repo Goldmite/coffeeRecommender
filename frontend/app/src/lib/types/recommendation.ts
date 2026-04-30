@@ -5,6 +5,12 @@ export interface RecommendationDto {
 	coffee: CoffeeBeanResponse;
 }
 
+export interface PurchaseDto {
+	rating: number;
+	purchaseDate: string;
+	coffee: CoffeeBeanResponse;
+}
+
 export interface ShopResponse {
 	id: number;
 	name: string;

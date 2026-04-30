@@ -4,13 +4,17 @@ import java.util.List;
 
 import org.recsys.dto.coffee.CoffeeBeanRequest;
 import org.recsys.dto.coffee.CoffeeBeanResponse;
+import org.recsys.dto.coffee.PurchasedCoffeeDto;
 import org.recsys.mapper.CoffeeMapper;
 import org.recsys.service.CoffeeService;
+import org.recsys.service.UserInteractionsService;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +32,7 @@ public class CoffeeController {
 
     private final CoffeeService coffeeService;
     private final CoffeeMapper mapper;
+    private final UserInteractionsService interactionsService;
 
     @GetMapping(params = "id")
     public ResponseEntity<CoffeeBeanResponse> getCoffeeById(@RequestParam Long id) throws NotFoundException {
@@ -37,6 +42,13 @@ public class CoffeeController {
     @GetMapping
     public ResponseEntity<List<CoffeeBeanResponse>> getAllCoffees() {
         return ResponseEntity.ok(coffeeService.getAllCoffees().stream().map(bean -> mapper.toResponse(bean)).toList());
+    }
+
+    @GetMapping("/purchased/user/{userId}")
+    public ResponseEntity<Page<PurchasedCoffeeDto>> getPurchasedCoffeesByUser(@PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(interactionsService.findPurchasedCoffeesByUser(userId, page, size));
     }
 
     @PostMapping

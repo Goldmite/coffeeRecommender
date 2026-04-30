@@ -31,7 +31,8 @@
 		inset: 0;
 		margin: auto;
 		padding: 0;
-		width: 90%;
+		width: fit-content;
+		min-width: 300px;
 		max-width: 600px;
 	}
 	.modal::backdrop {

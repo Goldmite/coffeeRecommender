@@ -64,7 +64,7 @@
 		</div>
 	</header>
 
-	<div class="flex flex-1 p-4">
+	<div class="flex flex-1 flex-col p-4">
 		{@render children()}
 	</div>
 

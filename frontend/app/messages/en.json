@@ -43,6 +43,7 @@
   "no_recommendations_generated": "No recommendations generated",
   "get_recommendations": "Get Recommendations",
   "coffee_beans_for_you": "Coffee beans for you",
+  "coffee_beans_purchased": "Purchased Coffees",
   "recommendation_count": [
     {
       "declarations": [
@@ -93,5 +94,16 @@
   "lighter": "Lighter",
   "current": "Current",
   "darker": "Darker",
-  "even_darker": "Even Darker"
+  "even_darker": "Even Darker",
+  "purchase_query": "Did you purchase this coffee?",
+  "yes": "Yes",
+  "recommendations": "Recommendations",
+  "purchases": "Purchases",
+  "rating": "Rating",
+  "no_purchased_coffees": "No Purchased Coffees",
+  "rate": "Rate",
+  "rate_this_coffee": "Rate this coffee!",
+  "previous": "Previous",
+  "next": "Next",
+  "date": "Date"
 }

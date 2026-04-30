@@ -2,6 +2,7 @@ import type { Recommendations, ShopResponse } from '$lib/types/recommendation';
 import { PUBLIC_API_BASE_URL } from '$env/static/public';
 import { error, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { recordInteraction } from '$lib/server/interactions';
 
 export const load: PageServerLoad = async ({ locals, cookies }) => {
 	const token = cookies.get('jwt');
@@ -121,5 +122,15 @@ export const actions = {
 		cookies.set('onboarded', 'true', { path: '/', maxAge: 60 * 60 * 24 });
 
 		return { success: true };
+	},
+	purchased: async ({ request, fetch, locals, cookies }) => {
+		const formData = await request.formData();
+
+		return await recordInteraction({
+			fetch,
+			token: cookies.get('jwt'),
+			userId: locals.userId,
+			formData,
+		});
 	},
 } satisfies Actions;
