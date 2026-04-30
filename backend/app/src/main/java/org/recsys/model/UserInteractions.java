@@ -1,5 +1,7 @@
 package org.recsys.model;
 
+import java.time.Instant;
+
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -14,7 +16,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,20 +45,20 @@ public class UserInteractions extends AuditEntity {
     @Column(name = "coffee_id")
     private Long coffeeId;
 
-    @MapsId("userId")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
     // keep interaction even if coffee is deleted
-    @MapsId("coffeeId")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coffee_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "coffee_id", insertable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private CoffeeBean coffeeBean;
 
     @Column(name = "rating")
     private Integer rating;
+
+    private Instant purchaseDate;
 
     @Builder.Default
     @Column(name = "is_clicked")

@@ -10,7 +10,7 @@
 	import ShopSelection from '$lib/components/ShopSelection.svelte';
 	import TasteOnboarding from '$lib/components/TasteOnboarding.svelte';
 	import { m } from '$lib/paraglide/messages.js';
-	import type { RecommendationDto, ShopResponse } from '$lib/types/recommendation';
+	import type { CoffeeBeanResponse, ShopResponse } from '$lib/types/recommendation';
 	import { tick } from 'svelte';
 	import type { PageProps } from './$types';
 
@@ -20,10 +20,10 @@
 	const count = $derived(form?.recommendations?.length ?? 0);
 	const isOnboarded = $derived(form?.success || !data.needsOnboarding);
 
-	let selectedCoffee = $state<RecommendationDto | undefined>(undefined);
+	let selectedCoffee = $state<CoffeeBeanResponse | undefined>(undefined);
 	let detailsModalRef: ReturnType<typeof Modal>;
-	function handleShowDetails(rec: RecommendationDto) {
-		selectedCoffee = rec;
+	function handleShowDetails(coffee: CoffeeBeanResponse) {
+		selectedCoffee = coffee;
 		detailsModalRef.open();
 	}
 	let clickedCoffeeId = $state<number | undefined>(undefined);
@@ -88,9 +88,9 @@
 	</div>
 </div>
 
-<Modal bind:this={detailsModalRef} headerTxt={selectedCoffee?.coffee.name}>
+<Modal bind:this={detailsModalRef} headerTxt={selectedCoffee?.name}>
 	{#if selectedCoffee}
-		<DetailsModalContent details={selectedCoffee.coffee} />
+		<DetailsModalContent details={selectedCoffee} />
 	{/if}
 </Modal>
 

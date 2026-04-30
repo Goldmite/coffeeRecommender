@@ -98,5 +98,11 @@
   "purchase_query": "Did you purchase this coffee?",
   "yes": "Yes",
   "recommendations": "Recommendations",
-  "purchases": "Purchases"
+  "purchases": "Purchases",
+  "rating": "Rating",
+  "no_purchased_coffees": "No Purchased Coffees",
+  "rate": "Rate",
+  "rate_this_coffee": "Rate this coffee!",
+  "previous": "Previous",
+  "next": "Next"
 }

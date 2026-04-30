@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
-	import type { RecommendationDto, Recommendations } from '$lib/types/recommendation';
+	import type { CoffeeBeanResponse, Recommendations } from '$lib/types/recommendation';
 	import RecommendationRow from './RecommendationRow.svelte';
 
 	let {
@@ -9,7 +9,7 @@
 		onUrlClick,
 	}: {
 		recommendations: Recommendations | undefined;
-		onShowDetails: (rec: RecommendationDto) => void;
+		onShowDetails: (coffee: CoffeeBeanResponse) => void;
 		onUrlClick: (coffeeId: number) => void;
 	} = $props();
 </script>

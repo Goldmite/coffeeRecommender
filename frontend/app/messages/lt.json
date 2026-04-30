@@ -96,9 +96,15 @@
 	"current": "Dabartinis",
 	"darker": "Tamsesnis",
 	"even_darker": "Dar tamsesnis",
-	"coffee_beans_purchased": "Jūsų įsigytos kavos pupelės",
+	"coffee_beans_purchased": "Įsigytos kavos",
 	"purchase_query": "Ar pirkote šią kavą?",
 	"yes": "Taip",
 	"recommendations": "Rekomendacijos",
-	"purchases": "Pirkimai"
+	"purchases": "Pirkimai",
+	"rating": "Įvertinimas",
+	"no_purchased_coffees": "Nėra pirktų kavų",
+	"rate": "Įvertinkite",
+	"rate_this_coffee": "Įvertinkite šią kavą!",
+	"previous": "Ankstesnis",
+	"next": "Toliau"
 }

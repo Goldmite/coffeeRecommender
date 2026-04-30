@@ -13,6 +13,14 @@ const paraglideHandle: Handle = ({ event, resolve }) =>
 		});
 	});
 
+const notFoundHandle: Handle = async ({ event, resolve }) => {
+	const response = await resolve(event);
+	if (response.status === 404) {
+		throw redirect(303, localizeHref('/login'));
+	}
+	return response;
+};
+
 const AUTH_ROUTES = new Set(['/login', '/signup']);
 const PROTECTED_ROUTES = new Set(['/home', '/profile', '/purchases']);
 
@@ -33,7 +41,6 @@ const authHandle: Handle = async ({ event, resolve }) => {
 			event.locals.userId = undefined;
 		}
 	}
-
 	const rootPath = deLocalizeHref(event.url.pathname);
 
 	const isLoggedIn = !!event.locals.userId;
@@ -52,4 +59,4 @@ const authHandle: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
-export const handle: Handle = sequence(paraglideHandle, authHandle);
+export const handle: Handle = sequence(paraglideHandle, notFoundHandle, authHandle);

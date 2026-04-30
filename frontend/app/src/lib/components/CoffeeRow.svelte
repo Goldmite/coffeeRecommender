@@ -1,28 +1,30 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages';
-	import type { CoffeeBeanResponse, RecommendationDto } from '$lib/types/recommendation';
+	import type { CoffeeBeanResponse } from '$lib/types/recommendation';
 	import { formatEnum, processMap, roastToLevel } from '$lib/utils/mapping';
 
 	let {
-		rec,
+		coffee,
+		rating,
 		rowNr,
 		onShowDetails,
-		onUrlClick,
+		onRatingClick,
 	}: {
-		rec: RecommendationDto;
+		coffee: CoffeeBeanResponse;
+		rating?: number;
 		rowNr: number;
 		onShowDetails: (coffee: CoffeeBeanResponse) => void;
-		onUrlClick: (coffeeId: number) => void;
+		onRatingClick: (coffeeId: number) => void;
 	} = $props();
 	// fallback to shop url if product url missing
-	const prodUrl = $derived(rec.coffee.productUrl || rec.coffee.shop.url);
-	const displayProcess = $derived(formatEnum(rec.coffee.process, processMap));
-	const roast = $derived(roastToLevel[rec.coffee.roastLevel]);
+	const prodUrl = $derived(coffee.productUrl || coffee.shop.url);
+	const displayProcess = $derived(formatEnum(coffee.process, processMap));
+	const roast = $derived(roastToLevel[coffee.roastLevel]);
 </script>
 
 <tr class="{rowNr % 2 && 'bg-main-mid/10'} hover:bg-main-mid/20">
 	<td>
-		{rec.coffee.name}
+		{coffee.name}
 	</td>
 	<td class="whitespace-nowrap">
 		{#each [1, 2, 3, 4, 5] as level}
@@ -34,28 +36,31 @@
 		{/each}
 	</td>
 	<td>
-		{rec.coffee.origins.join(', ')}
+		{coffee.origins.join(', ')}
 	</td>
 	<td>
 		<span>{displayProcess}</span>
 	</td>
 	<td>
-		{rec.coffee.shop.name}
+		{coffee.shop.name}
 	</td>
 	<td>
-		<span>{(rec.score * 100).toFixed(2)}%</span>
+		<button onclick={() => onRatingClick(coffee.id)} title={m.rate()} class="rating">
+			{#each [1, 2, 3, 4, 5] as ratingLevel}
+				{#if rating != undefined && ratingLevel <= rating}
+					<span class="icon-[streamline--coffee-bean-solid] bg-attention"></span>
+				{:else}
+					<span class="icon-[streamline--coffee-bean] bg-attention"></span>
+				{/if}
+			{/each}
+		</button>
 	</td>
 	<td>
 		<div class="flex flex-row items-center justify-between gap-4">
-			<a
-				href={prodUrl}
-				onclick={() => onUrlClick(rec.coffee.id)}
-				target="_blank"
-				class="text-secondary underline"
-			>
+			<a href={prodUrl} target="_blank" class="text-secondary underline">
 				{m.view()}
 			</a>
-			<button onclick={() => onShowDetails(rec.coffee)} title={m.details()} class="details">
+			<button onclick={() => onShowDetails(coffee)} title={m.details()} class="details">
 				<span class="icon-[streamline--bullet-list-solid]"></span>
 			</button>
 		</div>
@@ -70,7 +75,7 @@
 		border: 1px solid var(--color-main-border);
 		padding: 0.5rem;
 	}
-	.details {
+	.rating {
 		height: 24px;
 		padding: 2px;
 	}
