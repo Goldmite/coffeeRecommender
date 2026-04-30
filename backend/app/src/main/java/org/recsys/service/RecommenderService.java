@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.recsys.config.HybridConfig;
@@ -96,14 +97,16 @@ public class RecommenderService {
     }
 
     public List<Candidate> getCFCandidates(Long userId, int n, List<Integer> shopIds) {
-        TrainedModel model = provider.getCurrentModel().orElseThrow(() -> new RuntimeException());
+        Optional<TrainedModel> model = provider.getCurrentModel();
+        if (model.isEmpty())
+            return List.of();
 
         long now = Instant.now().getEpochSecond();
 
         List<Long> candidateIds = coffeeRepository.findAllIdsInShops(shopIds);
         return candidateIds.stream()
                 .map(coffeeId -> {
-                    float score = model.predict(userId, coffeeId, now);
+                    float score = model.get().predict(userId, coffeeId, now);
                     float nScore = score / 5.0f; // normalize
                     return new Candidate(coffeeId, nScore, "CF");
                 })
@@ -114,27 +117,29 @@ public class RecommenderService {
 
     public float[] prepareTargetVector(float[] userProfile, Map<Integer, Float> sessionFilters) {
         int dim = userProfile.length;
-        float[] baseWeights = weightVectorService.getBaseWeightVector();
+        float[] featureWeights = weightVectorService.getBaseWeightVector();
         float[] targetVector = new float[dim];
-        double magnitudeSq = 0;
 
         Map<Integer, Float> filters = (sessionFilters != null) ? sessionFilters : Collections.emptyMap();
 
         for (int i = 0; i < dim; i++) {
-            // use filter override if present, otherwise use config weight
-            float weight = filters.getOrDefault(i, baseWeights[i]);
-            // apply weight to user profile
-            targetVector[i] = userProfile[i] * weight;
 
-            magnitudeSq += targetVector[i] * targetVector[i];
-        }
-        // re-normalize
-        float magnitude = (float) Math.sqrt(magnitudeSq);
-        if (magnitude > 1e-9) {
-            for (int i = 0; i < dim; i++) {
-                targetVector[i] /= magnitude;
+            float userPref = userProfile[i];
+            float filterPref = filters.getOrDefault(i, 3.0f);
+
+            if (filterPref != 3.0f) {
+                // Normalize 1–5 to [-1, 1]
+                float normFilterPref = (filterPref - 3f) / 2f;
+                // combine - prioritizing filter over user pref
+                targetVector[i] = config.getAlpha() * normFilterPref + (1 - config.getAlpha()) * userPref;
+            } else {
+                targetVector[i] = userPref;
             }
         }
+
+        weightVectorService.applyFeatureWeights(targetVector, featureWeights);
+
+        weightVectorService.l2Normalize(targetVector);
 
         return targetVector;
     }

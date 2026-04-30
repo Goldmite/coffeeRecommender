@@ -19,7 +19,7 @@
 	<td>
 		{rec.coffee.name}
 	</td>
-	<td>
+	<td class="whitespace-nowrap">
 		{#each [1, 2, 3, 4, 5] as level}
 			{#if level <= roast}
 				<span class="icon-[streamline--coffee-bean-solid] bg-main-mid"></span>
@@ -38,7 +38,7 @@
 		{rec.coffee.shop.name}
 	</td>
 	<td>
-		<span>{(rec.score * 100).toFixed(0)}%</span>
+		<span>{(rec.score * 100).toFixed(2)}%</span>
 	</td>
 	<td>
 		<div class="flex flex-row items-center justify-between gap-4">

@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class CoffeeVectorService {
 
     private final FlavorVectorService flavorVectorService;
+    private final WeightVectorService weightVectorService;
 
     private static final List<String> ORIGINS = List.of("Brazil", "Colombia", "Ethiopia", "Peru", "Kenya", "Nicaragua",
             "Guatemala", "Indonesia", "India", "Other");
@@ -36,7 +37,7 @@ public class CoffeeVectorService {
     }
 
     public float[] createFlavorVector(CoffeeVectorizationDto dto) {
-        // Normalize simple attributes
+        // 1. Normalize simple attributes
         float[] normalizedPart = normalizeSimpleAttributes(dto);
         // Encoding categories (origins, process)
         float[] processPart = multiHotEncode(Collections.singletonList(dto.getProcess()),
@@ -45,34 +46,42 @@ public class CoffeeVectorService {
         // Flavors derived from Notes and fallback to Description derived features
         float[] flavorPart = flavorVectorService.getUnifiedFlavorVector(dto.getFlavorNotes(), dto.getDescription());
         // Combine vectors
-        return combine(normalizedPart, processPart, originPart, flavorPart);
+        float[] combined = combine(normalizedPart, processPart, originPart, flavorPart);
+        // 2. Apply feature weights
+        weightVectorService.applyFeatureWeights(combined, weightVectorService.getBaseWeightVector());
+        // 3. Normalize whole vector
+        return weightVectorService.l2Normalize(combined);
     }
 
     private float[] normalizeSimpleAttributes(CoffeeVectorizationDto dto) {
         float nRoast = normalize(dto.getRoastLevel(), 0, 4);
-        float nAltitude = normalize((dto.getAltitude().lower() + dto.getAltitude().upper()) / 2.0f, 1000, 2501);
-        float nScaScore = normalize(dto.getScaScore(), 80, 100);
+        float nAltitude = normalize((dto.getAltitude().lower() + dto.getAltitude().upper()) / 2.0f, 1000, 2501, 0, 1);
+        float nScaScore = normalize(dto.getScaScore(), 80, 100, 0, 1);
         float nAcidity = normalize(dto.getAcidity(), 1, 10);
         float nBody = normalize(dto.getBody(), 1, 10);
         float nAftertaste = normalize(dto.getAftertaste(), 1, 10);
         float nSweetness = normalize(dto.getSweetness(), 1, 10);
         float nBitterness = normalize(dto.getBitterness(), 1, 10);
 
-        float singleOrigin = dto.isSingleOrigin() ? 1.0f : 0.0f;
+        float singleOrigin = dto.isSingleOrigin() ? 1.0f : -1.0f;
 
         return new float[] { nRoast, nAltitude, nScaScore, nAcidity, nBody, nAftertaste, nSweetness, nBitterness,
                 singleOrigin };
     }
 
-    // normalize using min max to range [0, 1]
+    // normalize to [-1, 1]
     private float normalize(double x, double min, double max) {
+        return normalize(x, min, max, -1, 1);
+    }
+
+    // normalize using min max to range [a, b]
+    private float normalize(double x, double min, double max, int a, int b) {
         if (Double.compare(min, max) == 0) {
-            return 0.5f;
+            return 0;
         }
-        // min-max with range [0, 1]: (x - min) / (max - min)
-        double normalized = (x - min) / (max - min);
-        normalized = Math.max(0, Math.min(1, normalized)); // precaution for out of bounds
-        return (float) normalized;
+        // min-max with range [a, b]: a + ((x - min)(b - a) / (max - min))
+        double normalized = a + ((x - min) * (b - a)) / (max - min);
+        return (float) Math.max(-1, Math.min(1, normalized)); // precaution for out of bounds
     }
 
     private float[] multiHotEncode(List<String> values, List<String> allValues) {

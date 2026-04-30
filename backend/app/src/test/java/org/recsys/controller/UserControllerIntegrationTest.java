@@ -11,6 +11,7 @@ import org.recsys.config.TestConfig;
 import org.recsys.dto.user.UserLoginRequest;
 import org.recsys.dto.user.UserSignupRequest;
 import org.recsys.model.User;
+import org.recsys.model.UserPreferences;
 import org.recsys.repository.UserPreferencesRepository;
 import org.recsys.repository.UserRepository;
 import org.recsys.testutil.TestDataFactory;
@@ -59,7 +60,13 @@ class UserControllerIntegrationTest {
         user.setName(TestDataFactory.testName);
         user.setEmail(TestDataFactory.testEmail);
         user.setPasswordHash(passwordEncoder.encode(TestDataFactory.testPassword));
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+
+        UserPreferences prefs = new UserPreferences();
+        prefs.setUser(user);
+        preferencesRepository.save(prefs);
+
+        return saved;
     }
 
     @Test

@@ -36,16 +36,20 @@ public class ModelLifecycleManager {
         if (existingModel.isPresent() && isModelFresh(createdAt)) {
             log.info("Fresh model found.");
         } else {
-            log.info("No recent model found or model is stale. Triggering training...");
+            log.info("No recent model found or model is stale. Preparing data...");
             // prepare training data
-            PreparedTrainingData data = trainingDataService.prepareData(true);
-            // train model
-            TrainingResult result = mfModel.train(data);
-            // save model to database as artifact
-            mfModel.saveModel(result);
-            // update in-memory model
-            modelProvider.refreshModel();
-            log.info("Model training and refresh complete.");
+            Optional<PreparedTrainingData> data = trainingDataService.prepareData(true);
+            if (data.isPresent()) {
+                log.info("Data prepared. Initiating training...");
+                TrainingResult result = mfModel.train(data.get());
+                // save model to database as artifact
+                mfModel.saveModel(result);
+                // update in-memory model
+                modelProvider.refreshModel();
+                log.info("Model training and refresh complete.");
+            } else {
+                log.info("No data for training. Model was NOT created.");
+            }
         }
     }
 

@@ -19,28 +19,28 @@ app:
     secret: ${JWT_SECRET:staticfallbacksecretkeyfordevelopment256bit}
     expiration: 86400000 # 24 hours
   testdata:
-    seed: 22
+    seed: 0 # 0 for random seeding
 
 recommendation:
   weights:
-    roast-level: 1.0
-    sca-score: 1.5
-    altitude: 1.0
+    roast-level: 1.5
+    sca-score: 1.1
+    altitude: 0.6
     acidity: 1.4
-    body: 1.0
-    aftertaste: 1.0
-    sweetness: 1.2
+    body: 1.1
+    aftertaste: 1.1
+    sweetness: 1.1
     bitterness: 1.0
-    single-origin: 1.1
-    fruity: 2.0
-    floral: 2.0
+    single-origin: 1.5
+    fruity: 1.5
+    floral: 1.5
     nutty-cocoa: 1.5
-    sweet: 2.0
+    sweet: 1.5
     spices: 1.5
-    vegetal: 1.0
-    sour: 1.0
+    vegetal: 1.5
+    sour: 1.5
     processing: 1.0
-    origins: 1.0
+    origins: 0.5
   mf:
     latent-factors: 50
     learning-rate: 0.015
@@ -51,3 +51,4 @@ recommendation:
     cf: 0.8
     steepness: 0.4
     inflection-point: 10
+    alpha: 0.9

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +54,7 @@ class TrainingDataServiceTest {
 
         when(interactionRepository.findAll()).thenReturn(Arrays.asList(interaction1, interaction2));
         // when
-        PreparedTrainingData result = trainingDataService.prepareData(false);
+        PreparedTrainingData result = trainingDataService.prepareData(false).get();
         // then
         assertNotNull(result);
         List<RatingTriplet> triplets = result.triplets();
@@ -71,10 +72,9 @@ class TrainingDataServiceTest {
         // given
         when(interactionRepository.findAll()).thenReturn(List.of());
         // when
-        PreparedTrainingData result = trainingDataService.prepareData(true);
+        Optional<PreparedTrainingData> result = trainingDataService.prepareData(true);
         // then
-        assertTrue(result.triplets().isEmpty());
-        assertEquals(0.0f, result.globalMean());
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -90,7 +90,7 @@ class TrainingDataServiceTest {
                 .build();
         when(interactionRepository.findAll()).thenReturn(List.of(clickOnly));
         // when
-        PreparedTrainingData result = trainingDataService.prepareData(false);
+        PreparedTrainingData result = trainingDataService.prepareData(false).get();
         // then
         assertEquals(1.7f, result.triplets().getFirst().score(), "Click should result in score of 1.7");
     }
@@ -108,7 +108,7 @@ class TrainingDataServiceTest {
                 .build();
         when(interactionRepository.findAll()).thenReturn(List.of(rated));
         // when
-        PreparedTrainingData result = trainingDataService.prepareData(false);
+        PreparedTrainingData result = trainingDataService.prepareData(false).get();
         // then
         assertEquals(3.0f, result.triplets().getFirst().score());
     }
@@ -126,7 +126,7 @@ class TrainingDataServiceTest {
                 .build();
         when(interactionRepository.findAll()).thenReturn(List.of(rated));
         // when
-        PreparedTrainingData result = trainingDataService.prepareData(false);
+        PreparedTrainingData result = trainingDataService.prepareData(false).get();
         // then
         assertEquals(0.0f, result.triplets().getFirst().score());
     }

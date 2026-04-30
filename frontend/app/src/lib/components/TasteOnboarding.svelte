@@ -39,11 +39,12 @@
 		<input type="hidden" name="prepMethod" value={selectedPrepMethod} />
 	</div>
 
-	<div class="space-y-4">
-		<label for="experience">{m.xp_level()}:</label>
-		<span class="ml-2 font-normal italic">{experienceLevel.label}</span>
-
-		<ProgressSlider bind:value={selectedIdx} max={3}></ProgressSlider>
+	<div>
+		<div class="mb-1.5">
+			<label for="experience">{m.xp_level()}:</label>
+			<span class="ml-2 font-normal italic">{experienceLevel.label}</span>
+		</div>
+		<ProgressSlider bind:value={selectedIdx} min={0} max={3}></ProgressSlider>
 
 		<input type="hidden" name="experience" value={selectedLevel} />
 	</div>

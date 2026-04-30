@@ -34,13 +34,44 @@ export const actions = {
 		}
 
 		const formData = await request.formData();
-
 		const shopIds = formData.getAll('shopIds');
-		const featureFilter = {}; // TODO: fill in when feature filter present
+		let featureFilterReq = {};
 
+		const areFeatureFiltersUsed = formData.get('filterEnabled') === 'true';
+		if (areFeatureFiltersUsed) {
+			const flavorFilters = formData.getAll('flavors');
+			const originTypeInput = formData.getAll('origin-type'); // only fetches checked value
+			const originTypeWeight = originTypeInput.includes('single-origin')
+				? '5'
+				: originTypeInput.includes('blend')
+					? '0'
+					: null;
+			// helper - return null when default value (3)
+			const getAttributeWeight = (value: FormDataEntryValue | null) =>
+				value ? (value == '3' ? null : value) : null;
+			// helper - 1.0 is default weight, null falls back to base default
+			const getFlavorWeight = (category: string) => (flavorFilters.includes(category) ? '5' : null);
+			featureFilterReq = {
+				roastWeight: getAttributeWeight(formData.get('roast')),
+				scaWeight: getAttributeWeight(formData.get('sca')),
+				acidityWeight: getAttributeWeight(formData.get('acidity')),
+				bodyWeight: getAttributeWeight(formData.get('body')),
+				aftertasteWeight: getAttributeWeight(formData.get('aftertaste')),
+				sweetnessWeight: getAttributeWeight(formData.get('sweetness')),
+				bitternessWeight: getAttributeWeight(formData.get('bitterness')),
+				singleOriginWeight: originTypeWeight,
+				fruityWeight: getFlavorWeight('FRUITY'),
+				floralWeight: getFlavorWeight('FLORAL'),
+				sweetWeight: getFlavorWeight('SWEET'),
+				nuttyCocoaWeight: getFlavorWeight('NUTTY_COCOA'),
+				spicesWeight: getFlavorWeight('SPICES'),
+				sourWeight: getFlavorWeight('SOUR'),
+				vegetalWeight: getFlavorWeight('VEGETAL'),
+			};
+		}
 		const requestFilters = {
 			shopIds: shopIds,
-			featureFilter: featureFilter,
+			featureFilter: featureFilterReq,
 		};
 
 		const response = await fetch(

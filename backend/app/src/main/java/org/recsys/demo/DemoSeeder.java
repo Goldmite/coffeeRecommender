@@ -29,16 +29,16 @@ public class DemoSeeder implements CommandLineRunner {
 
         System.out.println("Seeding 5 coffee shops...");
         List<ShopRequest> shops = List.of(
-                new ShopRequest("Shop A", "https://example.com", null),
-                new ShopRequest("Shop B", "https://example.com", null),
-                new ShopRequest("Shop C", "https://example.com", null),
-                new ShopRequest("Shop D", "https://example.com", null),
-                new ShopRequest("Shop E", "https://example.com", null));
+                new ShopRequest("Shop A", "https://example.com", true),
+                new ShopRequest("Shop B", "https://example.com", true),
+                new ShopRequest("Shop C", "https://example.com", true),
+                new ShopRequest("Shop D", "https://example.com", true),
+                new ShopRequest("Shop E", "https://example.com", true));
         shopService.createShops(shops);
 
         CoffeeDataGenerator gen = new CoffeeDataGenerator(random);
-        System.out.println("Seeding 100 coffees...");
-        for (int i = 1; i <= 100; i++) {
+        System.out.println("Seeding 200 coffees...");
+        for (int i = 1; i <= 200; i++) {
             service.addCoffee(gen.generate(i));
         }
     }

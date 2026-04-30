@@ -15,9 +15,9 @@ public class WeightVectorService {
 
     public float[] getBaseWeightVector() {
         float[] weights = new float[30];
-        // Fill with neutral weights frist
+        // Fill with neutral weights first
         Arrays.fill(weights, 1.0f);
-        // Map configurations
+        // simple attribute [0-8]
         weights[0] = config.getRoastLevel();
         weights[1] = config.getAltitude();
         weights[2] = config.getScaScore();
@@ -27,7 +27,15 @@ public class WeightVectorService {
         weights[6] = config.getSweetness();
         weights[7] = config.getBitterness();
         weights[8] = config.getSingleOrigin();
-        // Mapping flavor categories
+        // processing [9-12]
+        for (int i = 9; i <= 12; i++) {
+            weights[i] = config.getProcessing();
+        }
+        // origins [13-22]
+        for (int i = 13; i <= 22; i++) {
+            weights[i] = config.getOrigins();
+        }
+        // flavor categories [23-29]
         weights[23] = config.getFruity();
         weights[24] = config.getFloral();
         weights[25] = config.getSweet();
@@ -36,8 +44,34 @@ public class WeightVectorService {
         weights[28] = config.getVegetal();
         weights[29] = config.getSour();
 
-        // Defaults for the rest
-
         return weights;
+    }
+
+    public float[] applyFeatureWeights(float[] rawVector, float[] featureWeights) {
+        for (int i = 0; i < rawVector.length; i++) {
+            rawVector[i] *= featureWeights[i];
+        }
+        return rawVector;
+    }
+
+    // normalize after applying weights
+    public float[] l2Normalize(float[] vector) {
+        float sum = 0f;
+
+        for (float v : vector) {
+            sum += v * v;
+        }
+        float norm = (float) Math.sqrt(sum);
+
+        if (norm == 0f) {
+            return vector;
+        }
+
+        float[] result = new float[vector.length];
+        for (int i = 0; i < vector.length; i++) {
+            result[i] = vector[i] / norm;
+        }
+
+        return result;
     }
 }

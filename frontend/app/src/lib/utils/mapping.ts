@@ -28,6 +28,14 @@ export const roastToLevel: Record<string, number> = {
 	DARK: 5,
 };
 
+export const levelToRoast: Record<number, string> = {
+	1: m.even_lighter(),
+	2: m.lighter(),
+	3: m.current(),
+	4: m.darker(),
+	5: m.even_darker(),
+};
+
 export const experienceMap: Record<ExperienceLevel, { value: number; label: string }> = {
 	BEGINNER: { value: 1, label: m.xp_beginner() },
 	INTERMEDIATE: { value: 2, label: m.xp_intermediate() },
@@ -51,4 +59,22 @@ export const prepMethodMap: Record<PrepMethod, { label: string }> = {
 	OTHER: {
 		label: m.other(),
 	},
+};
+
+export const flavorCategoryMap: Record<string, string> = {
+	FRUITY: m.flavor_fruity(),
+	FLORAL: m.flavor_floral(),
+	SWEET: m.flavor_sweet(),
+	NUTTY_COCOA: m.flavor_nutty_cocoa(),
+	SPICES: m.flavor_spices(),
+	SOUR: m.flavor_sour(),
+	VEGETAL: m.flavor_vegetal(),
+};
+
+export const intensityMap: Record<number, string> = {
+	1: m.low(),
+	2: m.lower(),
+	3: m.standard(),
+	4: m.higher(),
+	5: m.high(),
 };

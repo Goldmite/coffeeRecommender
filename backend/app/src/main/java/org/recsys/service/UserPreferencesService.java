@@ -28,7 +28,7 @@ public class UserPreferencesService {
                 .user(user)
                 .experienceLevel(ExperienceLevel.BEGINNER)
                 .prepMethod(null)
-                .tasteProfile(vectorService.createBaseVector())
+                .tasteProfile(null)
                 .build();
 
         return preferencesRepository.save(preferences);
@@ -70,6 +70,7 @@ public class UserPreferencesService {
         int aftertaste = 5;
         int bitterness = 5;
         int sweetness = 6;
+        double scaScore = 80.0;
         int roast = RoastLevel.MEDIUM.ordinal();
         String process = Processing.NATURAL.getProcess();
         // 1. Adjust based on Prep Method (The "Extraction" Bias)
@@ -117,6 +118,7 @@ public class UserPreferencesService {
                 aftertaste += 2;
                 body -= 1;
                 sweetness += 2;
+                scaScore = 83.5;
                 process = Processing.WASHED.getProcess();
             }
             case EXPERT -> {
@@ -125,6 +127,7 @@ public class UserPreferencesService {
                 sweetness += 2;
                 bitterness -= 1;
                 aftertaste += 2;
+                scaScore = 87.0;
                 process = Processing.WASHED.getProcess();
             }
         }
@@ -132,6 +135,7 @@ public class UserPreferencesService {
         CoffeeVectorizationDto dto = CoffeeVectorizationDto.builder()
                 .process(process)
                 .roastLevel(roast)
+                .scaScore(scaScore)
                 .altitude(determineAltitude(request.experience()))
                 .acidity(clamp(acidity))
                 .body(clamp(body))
@@ -140,7 +144,11 @@ public class UserPreferencesService {
                 .bitterness(clamp(bitterness))
                 .build();
 
-        return vectorService.createFlavorVector(dto);
+        float[] adjustedVector = vectorService.createFlavorVector(dto);
+
+        adjustedVector[8] = 0; // origin type (single/blend)
+
+        return adjustedVector;
     }
 
     private Range<Integer> determineAltitude(ExperienceLevel xp) {

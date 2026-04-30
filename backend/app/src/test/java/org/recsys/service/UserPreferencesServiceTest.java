@@ -39,18 +39,15 @@ class UserPreferencesServiceTest {
         User user = new User();
         user.setId(1L);
 
-        float[] mockVector = { 0.1f, 0.5f, 0.9f };
-        when(vectorService.createBaseVector()).thenReturn(mockVector);
         when(preferencesRepository.save(any(UserPreferences.class))).thenAnswer(i -> i.getArguments()[0]);
         // when
         UserPreferences result = userPreferencesService.setDefaultPreferencesForUser(user);
         // then
         assertEquals(user, result.getUser());
         assertEquals(ExperienceLevel.BEGINNER, result.getExperienceLevel());
-        assertEquals(mockVector, result.getTasteProfile());
+        assertNull(result.getTasteProfile());
         assertNull(result.getPrepMethod());
 
-        verify(vectorService, times(1)).createBaseVector();
         verify(preferencesRepository, times(1)).save(any(UserPreferences.class));
     }
 
