@@ -6,9 +6,11 @@
 	let {
 		recommendations,
 		onShowDetails,
+		onUrlClick,
 	}: {
 		recommendations: Recommendations | undefined;
 		onShowDetails: (rec: RecommendationDto) => void;
+		onUrlClick: (coffeeId: number) => void;
 	} = $props();
 </script>
 
@@ -26,7 +28,7 @@
 	</thead>
 	<tbody>
 		{#each recommendations as rec, i}
-			<RecommendationRow {rec} rowNr={i} {onShowDetails} />
+			<RecommendationRow {rec} rowNr={i} {onShowDetails} {onUrlClick} />
 		{:else}
 			<tr
 				><td colspan="7" class="text-center italic p-10 text-lg bg-main-mid/10">

@@ -39,7 +39,7 @@ const authHandle: Handle = async ({ event, resolve }) => {
 	const isLoggedIn = !!event.locals.userId;
 
 	const isAuthPage = rootPath === 'login' || rootPath === 'signup';
-	const isProtectedRoute = rootPath === 'home' || rootPath === 'profile';
+	const isProtectedRoute = rootPath === 'home' || rootPath === 'profile' || 'purchases';
 
 	if (!isLoggedIn && isProtectedRoute) {
 		const lang = isLangPrefix ? `/${pathSegments[0]}` : '';

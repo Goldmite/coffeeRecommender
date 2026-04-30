@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import Card from '$lib/components/core/Card.svelte';
-	import DetailsModal from '$lib/components/core/Modal.svelte';
+	import Modal from '$lib/components/core/Modal.svelte';
 	import GenerateButton from '$lib/components/core/SubmitButton.svelte';
 	import DetailsModalContent from '$lib/components/DetailsModalContent.svelte';
 	import FeatureFilter from '$lib/components/FeatureFilter.svelte';
+	import PurchaseQueryForm from '$lib/components/PurchaseQueryForm.svelte';
 	import RecommendationList from '$lib/components/RecommendationList.svelte';
 	import ShopSelection from '$lib/components/ShopSelection.svelte';
 	import TasteOnboarding from '$lib/components/TasteOnboarding.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import type { RecommendationDto, ShopResponse } from '$lib/types/recommendation';
+	import { tick } from 'svelte';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -18,12 +20,24 @@
 	const count = $derived(form?.recommendations?.length ?? 0);
 	const isOnboarded = $derived(form?.success || !data.needsOnboarding);
 
-	let modalRef: ReturnType<typeof DetailsModal>;
-	let selectedCoffee = $state<RecommendationDto | null>(null);
-
+	let selectedCoffee = $state<RecommendationDto | undefined>(undefined);
+	let detailsModalRef: ReturnType<typeof Modal>;
 	function handleShowDetails(rec: RecommendationDto) {
 		selectedCoffee = rec;
-		modalRef.open();
+		detailsModalRef.open();
+	}
+	let clickedCoffeeId = $state<number | undefined>(undefined);
+	let purchaseQueryModalRef: ReturnType<typeof Modal>;
+	let clickedFormElementRef: ReturnType<typeof PurchaseQueryForm> | undefined = $state(undefined);
+	async function handlePurchaseQuery(coffeeId: number) {
+		clickedCoffeeId = coffeeId;
+
+		await tick(); // render if block to bind ref
+
+		if (clickedFormElementRef) {
+			clickedFormElementRef.requestSubmit();
+		}
+		purchaseQueryModalRef.open();
 	}
 
 	const shops: ShopResponse[] = $derived(data.shopList);
@@ -69,6 +83,7 @@
 				<RecommendationList
 					recommendations={form?.recommendations}
 					onShowDetails={handleShowDetails}
+					onUrlClick={handlePurchaseQuery}
 				/>
 			</Card>
 			<span class="ml-2 text-sm text-main-border italic">{m.recommendation_count({ count })}.</span>
@@ -76,8 +91,22 @@
 	</div>
 </div>
 
-<DetailsModal bind:this={modalRef} headerTxt={selectedCoffee?.coffee.name}>
+<Modal bind:this={detailsModalRef} headerTxt={selectedCoffee?.coffee.name}>
 	{#if selectedCoffee}
-		<DetailsModalContent details={selectedCoffee.coffee}></DetailsModalContent>
+		<DetailsModalContent details={selectedCoffee.coffee} />
 	{/if}
-</DetailsModal>
+</Modal>
+
+<Modal bind:this={purchaseQueryModalRef} headerTxt={m.purchase_query()}>
+	{#if clickedCoffeeId}
+		<PurchaseQueryForm
+			formId="buy-form"
+			id={clickedCoffeeId}
+			isPurchased={true}
+			onSuccess={() => purchaseQueryModalRef.close()}
+		/>
+	{/if}
+</Modal>
+{#if clickedCoffeeId}
+	<PurchaseQueryForm bind:this={clickedFormElementRef} formId="pre-query" id={clickedCoffeeId} />
+{/if}

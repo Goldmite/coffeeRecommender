@@ -7,8 +7,13 @@
 		rec,
 		rowNr,
 		onShowDetails,
-	}: { rec: RecommendationDto; rowNr: number; onShowDetails: (rec: RecommendationDto) => void } =
-		$props();
+		onUrlClick,
+	}: {
+		rec: RecommendationDto;
+		rowNr: number;
+		onShowDetails: (rec: RecommendationDto) => void;
+		onUrlClick: (coffeeId: number) => void;
+	} = $props();
 	// fallback to shop url if product url missing
 	const prodUrl = $derived(rec.coffee.productUrl || rec.coffee.shop.url);
 	const displayProcess = $derived(formatEnum(rec.coffee.process, processMap));
@@ -42,7 +47,12 @@
 	</td>
 	<td>
 		<div class="flex flex-row items-center justify-between gap-4">
-			<a href={prodUrl} target="_blank" class="text-secondary underline">
+			<a
+				href={prodUrl}
+				onclick={() => onUrlClick(rec.coffee.id)}
+				target="_blank"
+				class="text-secondary underline"
+			>
 				{m.view()}
 			</a>
 			<button onclick={() => onShowDetails(rec)} title={m.details()} class="details">

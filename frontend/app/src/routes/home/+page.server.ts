@@ -122,4 +122,29 @@ export const actions = {
 
 		return { success: true };
 	},
+	purchased: async ({ request, fetch, locals, cookies }) => {
+		// userId - required
+		// coffeeId - required
+		// purchased - optional (boolean)
+		// rating - optional [1-5] (number)
+		const token = cookies.get('jwt');
+		if (!token || !locals.userId) {
+			throw error(401, 'Not authenticated');
+		}
+
+		const formData = await request.formData();
+		formData.append('userId', locals.userId.toString());
+
+		const response = await fetch(`${PUBLIC_API_BASE_URL}/users/interactions`, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${token}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(Object.fromEntries(formData)),
+		});
+		if (!response.ok) {
+			throw error(response.status);
+		}
+	},
 } satisfies Actions;

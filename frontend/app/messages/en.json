@@ -93,5 +93,7 @@
   "lighter": "Lighter",
   "current": "Current",
   "darker": "Darker",
-  "even_darker": "Even Darker"
+  "even_darker": "Even Darker",
+  "purchase_query": "Did you purchase this coffee?",
+  "yes": "Yes"
 }
