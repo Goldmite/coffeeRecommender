@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.recsys.component.ModelLifecycleManager;
 import org.recsys.config.HybridConfig;
 import org.recsys.dto.recommendation.Candidate;
 import org.recsys.dto.recommendation.RecommendationDto;
@@ -36,6 +37,7 @@ public class RecommenderService {
     private final HybridConfig config;
     private final CoffeeMapper mapper;
     private final WeightMapper weightMapper;
+    private final ModelLifecycleManager manager;
 
     public List<RecommendationDto> getHybridRecommendations(Long userId, int limit,
             RecommendationFilterRequest filterRequest) {
@@ -153,7 +155,7 @@ public class RecommenderService {
         float dynamicWeight = (float) (config.getCf()
                 / (1 + Math.exp(-config.getSteepness() * (interactionCount - config.getInflectionPoint()))));
 
-        return dynamicWeight;
+        return dynamicWeight * manager.getSystemMaturity();
     }
 
 }

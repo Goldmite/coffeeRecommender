@@ -40,7 +40,7 @@ public class UserPreferencesService {
 
     public float[] getUserPreferenceFlavorProfile(Long userId) {
         Optional<UserPreferences> pref = getUserPreferencesByUserId(userId);
-        if (pref.isPresent()) {
+        if (pref.isPresent() && pref.get().getTasteProfile() != null) {
             return pref.get().getTasteProfile();
         } else {
             return vectorService.createBaseVector(); // fallback
