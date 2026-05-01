@@ -105,5 +105,9 @@
   "rate_this_coffee": "Rate this coffee!",
   "previous": "Previous",
   "next": "Next",
-  "date": "Date"
+  "date": "Date",
+  "user": "User",
+  "profile": "Profile",
+  "profile_settings": "Profile settings",
+  "logout": "Logout"
 }

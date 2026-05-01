@@ -8,6 +8,7 @@ import org.recsys.dto.shop.ShopUpdateRequest;
 import org.recsys.service.ShopService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,17 +36,20 @@ public class ShopController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ShopResponse>> addShops(@Valid @RequestBody List<ShopRequest> req) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(shopService.createShops(req).stream().map(ShopResponse::fromEntity).toList());
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ShopResponse>> updateShopInfo(@Valid @RequestBody List<ShopUpdateRequest> req) {
         return ResponseEntity.ok(shopService.updateShops(req).stream().map(ShopResponse::fromEntity).toList());
     }
 
     @DeleteMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> removeShops(@RequestBody List<Integer> ids) {
         shopService.deleteShops(ids);
         return ResponseEntity.noContent().build();

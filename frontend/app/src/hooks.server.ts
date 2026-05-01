@@ -13,8 +13,13 @@ const paraglideHandle: Handle = ({ event, resolve }) =>
 		});
 	});
 
-const notFoundHandle: Handle = async ({ event, resolve }) => {
+const errorResponseHandle: Handle = async ({ event, resolve }) => {
 	const response = await resolve(event);
+
+	if (response.status === 401) {
+		event.cookies.delete('jwt', { path: '/' });
+		throw redirect(303, localizeHref('/login'));
+	}
 	if (response.status === 404) {
 		throw redirect(303, localizeHref('/login'));
 	}
@@ -36,6 +41,7 @@ const authHandle: Handle = async ({ event, resolve }) => {
 
 			event.locals.userId = payload.id;
 			event.locals.userEmail = payload.sub;
+			event.locals.username = payload.username;
 			event.locals.isNew = hasOnboardingCookie ? false : payload.new;
 		} catch (error) {
 			event.locals.userId = undefined;
@@ -59,4 +65,4 @@ const authHandle: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
-export const handle: Handle = sequence(paraglideHandle, notFoundHandle, authHandle);
+export const handle: Handle = sequence(paraglideHandle, errorResponseHandle, authHandle);

@@ -6,6 +6,7 @@ declare global {
 		interface Locals {
 			userId?: number;
 			userEmail?: string;
+			username?: string;
 			isNew?: boolean;
 		}
 		// interface PageData {}
