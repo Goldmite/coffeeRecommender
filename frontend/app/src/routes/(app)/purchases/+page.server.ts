@@ -12,7 +12,7 @@ export const load: PageServerLoad = async ({ url, locals, cookies }) => {
 	const page = url.searchParams.get('page') || '0';
 
 	const response = await fetch(
-		`${PUBLIC_API_BASE_URL}/coffee/purchased/user/${locals.userId}?page=${page}&size=10`,
+		`${PUBLIC_API_BASE_URL}/coffee/purchased/user/${locals.userId}?page=${page}`,
 		{
 			method: 'GET',
 			headers: {

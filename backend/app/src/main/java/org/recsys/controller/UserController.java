@@ -46,7 +46,7 @@ public class UserController {
 
         UserResponse userRes = UserResponse.fromEntity(userService.login(request));
         boolean isNew = prefService.isUserUsingDefaultPreferences(userRes.getId());
-        String token = jwtUtils.generateToken(request.getEmail(), userRes.getId(), isNew);
+        String token = jwtUtils.generateToken(request.getEmail(), userRes.getId(), userRes.getName(), isNew);
 
         return ResponseEntity.ok(new AuthResponse(token, userRes));
     }

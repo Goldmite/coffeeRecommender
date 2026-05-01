@@ -1,4 +1,4 @@
-package org.recsys.demo;
+package org.recsys.component;
 
 import java.util.List;
 import java.util.Random;
@@ -41,5 +41,7 @@ public class DemoSeeder implements CommandLineRunner {
         for (int i = 1; i <= 200; i++) {
             service.addCoffee(gen.generate(i));
         }
+        System.out.println("Updating coffee vectors...");
+        service.batchUpdateCoffeeVectors();
     }
 }

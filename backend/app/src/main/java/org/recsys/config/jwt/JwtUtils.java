@@ -23,10 +23,11 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
-    public String generateToken(String email, Long userId, boolean isNew) {
+    public String generateToken(String email, Long userId, String name, boolean isNew) {
         return Jwts.builder()
                 .setSubject(email)
                 .claim("id", userId)
+                .claim("username", name)
                 .claim("new", isNew)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
