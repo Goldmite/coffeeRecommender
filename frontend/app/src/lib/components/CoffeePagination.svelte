@@ -14,7 +14,7 @@
 		currentPage: number;
 		totalPages: number;
 		onShowDetails: (coffee: CoffeeBeanResponse) => void;
-		onRatingClick: (coffeeId: number) => void;
+		onRatingClick: (coffeeId: number, coffeeRating: number) => void;
 	} = $props();
 </script>
 

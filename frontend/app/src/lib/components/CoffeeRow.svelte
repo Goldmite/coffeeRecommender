@@ -16,7 +16,7 @@
 		purchaseDate?: string;
 		rowNr: number;
 		onShowDetails: (coffee: CoffeeBeanResponse) => void;
-		onRatingClick: (coffeeId: number) => void;
+		onRatingClick: (coffeeId: number, coffeeRating: number) => void;
 	} = $props();
 	// fallback to shop url if product url missing
 	const prodUrl = $derived(coffee.productUrl || coffee.shop.url);
@@ -47,7 +47,7 @@
 		{coffee.shop.name}
 	</td>
 	<td class="whitespace-nowrap">
-		<button onclick={() => onRatingClick(coffee.id)} title={m.rate()} class="rating">
+		<button onclick={() => onRatingClick(coffee.id, rating ?? 0)} title={m.rate()} class="rating">
 			{#each [1, 2, 3, 4, 5] as ratingLevel}
 				{#if rating != undefined && ratingLevel <= rating}
 					<span class="icon-[streamline--coffee-bean-solid] bg-attention"></span>

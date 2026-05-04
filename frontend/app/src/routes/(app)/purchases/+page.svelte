@@ -20,12 +20,18 @@
 
 	let ratingCoffeeId = $state<number | undefined>(undefined);
 	let ratingModalRef: ReturnType<typeof Modal>;
-	function handleRatingModal(coffeeId: number) {
+	function handleRatingModal(coffeeId: number, coffeeRating: number) {
 		ratingCoffeeId = coffeeId;
+		initialRating = coffeeRating;
+		rating = coffeeRating;
 		ratingModalRef.open();
 	}
+	let initialRating = $state(0);
 	let rating = $state(0);
 	let hoveredRating = $state(0);
+
+	const isDirty = $derived(rating !== 0 && rating !== initialRating);
+	const displayRating = $derived(hoveredRating || rating);
 </script>
 
 <div class="w-210">
@@ -74,7 +80,7 @@
 						}}
 						onclick={() => (rating = beanStar)}
 					>
-						{#if beanStar <= (hoveredRating || rating)}
+						{#if beanStar <= displayRating}
 							<span class="icon-[streamline--coffee-bean-solid] size-8 bg-attention"></span>
 						{:else}
 							<span class="icon-[streamline--coffee-bean] size-8 bg-attention"></span>
@@ -82,7 +88,7 @@
 					</button>
 				{/each}
 			</div>
-			<SubmitButton disabled={rating == 0}>{m.rate()}</SubmitButton>
+			<SubmitButton disabled={!isDirty}>{m.rate()}</SubmitButton>
 		</form>
 	{/if}
 </Modal>

@@ -57,14 +57,19 @@ public class UserInteractionsService {
         if (request.purchased() != null && request.purchased()) {
             interaction.setIsPurchased(true);
             interaction.setPurchaseDate(Instant.now());
-            shiftStrength = 0.1f;
+            shiftStrength = 0.015f;
         }
 
         if (request.rating() != null) {
+            Integer oldRating = interaction.getRating();
             interaction.setRating(request.rating());
             // rating - shift alpha
-            // 1&2: -0.03f; 3: 0f; 4: 0.05f; 5: 0.1f
-            shiftStrength = (request.rating() >= 3) ? (request.rating() - 3.0f) * 0.5f : -0.03f;
+            // 1: -0.04f; 2: -0.02f; 3: 0f; 4: 0.02f; 5: 0.04f
+            float oldAlpha = (oldRating != null) ? (oldRating - 3.0f) * 0.02f : 0.0f;
+            float newAlpha = (request.rating() - 3.0f) * 0.05f;
+            // shift is the diff between last rating (older data) and new rating (user
+            // evolving taste)
+            shiftStrength = newAlpha - oldAlpha;
         }
         UserInteractions saved = interactionsRepository.save(interaction);
         // shift user flavor profile towards coffee vector by strength (alpha) amount
