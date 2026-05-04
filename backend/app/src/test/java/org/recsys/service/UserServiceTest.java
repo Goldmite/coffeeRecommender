@@ -116,7 +116,7 @@ class UserServiceTest {
         assertEquals(mockUser.getEmail(), userDetails.getUsername());
         assertEquals(mockUser.getPasswordHash(), userDetails.getPassword());
         assertTrue(userDetails.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("USER")));
+                .anyMatch(a -> a.getAuthority().equals("ROLE_USER")));
         verify(userRepository, times(1)).findByEmail(mockUser.getEmail());
     }
 

@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.recsys.dto.coffee.CoffeeVectorizationDto;
 import org.recsys.dto.user.OnboardingRequest;
 import org.recsys.model.ExperienceLevel;
+import org.recsys.model.PrepMethod;
 import org.recsys.model.Processing;
 import org.recsys.model.RoastLevel;
 import org.recsys.model.User;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import io.hypersistence.utils.hibernate.type.range.Range;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -22,6 +24,7 @@ public class UserPreferencesService {
 
     private final UserPreferencesRepository preferencesRepository;
     private final CoffeeVectorService vectorService;
+    private final WeightVectorService weightVectorService;
 
     public UserPreferences setDefaultPreferencesForUser(User user) {
         UserPreferences preferences = UserPreferences.builder()
@@ -40,13 +43,14 @@ public class UserPreferencesService {
 
     public float[] getUserPreferenceFlavorProfile(Long userId) {
         Optional<UserPreferences> pref = getUserPreferencesByUserId(userId);
-        if (pref.isPresent()) {
+        if (pref.isPresent() && pref.get().getTasteProfile() != null) {
             return pref.get().getTasteProfile();
         } else {
             return vectorService.createBaseVector(); // fallback
         }
     }
 
+    @Transactional
     public void updateUserPreferencesAfterOnboarding(OnboardingRequest request) {
         UserPreferences pref = preferencesRepository.findById(request.userId())
                 .orElseThrow(() -> new EntityNotFoundException());
@@ -62,6 +66,48 @@ public class UserPreferencesService {
 
     public boolean isUserUsingDefaultPreferences(Long userId) {
         return preferencesRepository.isNewUser(userId);
+    }
+
+    @Transactional
+    public void updatePrepMethod(OnboardingRequest request) {
+        Long userId = request.userId();
+        PrepMethod newMethod = request.prepMethod();
+        ExperienceLevel newExperienceLevel = request.experience();
+        UserPreferences pref = preferencesRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException());
+
+        PrepMethod oldMethod = pref.getPrepMethod();
+        ExperienceLevel oldExperienceLevel = pref.getExperienceLevel();
+        if (oldMethod == newMethod && oldExperienceLevel == newExperienceLevel)
+            return;
+
+        float[] currentVector = pref.getTasteProfile();
+
+        // generate the original base for the old method to know the baseline
+        OnboardingRequest oldRequest = new OnboardingRequest(userId, oldExperienceLevel, oldMethod);
+        float[] oldBase = calculateNewUserVector(oldRequest);
+        // generate the new base for the new method
+        OnboardingRequest newRequest = new OnboardingRequest(userId, newExperienceLevel, newMethod);
+        float[] newBase = calculateNewUserVector(newRequest);
+        // compare the current to old baseline to extract history
+        float[] prefHistory = new float[currentVector.length];
+        for (int i = 0; i < currentVector.length; i++) {
+            prefHistory[i] = currentVector[i] - oldBase[i];
+        }
+        // apply new base with the history
+        float[] adjustedVector = new float[currentVector.length];
+        for (int i = 0; i < adjustedVector.length; i++) {
+            adjustedVector[i] = newBase[i] * 0.6f + prefHistory[i] * 0.4f;
+
+            adjustedVector[i] = Math.max(-1.0f, Math.min(1.0f, adjustedVector[i]));
+        }
+        // renormalize
+        float[] normalizedNewProfile = weightVectorService.l2Normalize(adjustedVector);
+
+        pref.setPrepMethod(newMethod);
+        pref.setExperienceLevel(newExperienceLevel);
+        pref.setTasteProfile(normalizedNewProfile);
+        preferencesRepository.save(pref);
     }
 
     public float[] calculateNewUserVector(OnboardingRequest request) {

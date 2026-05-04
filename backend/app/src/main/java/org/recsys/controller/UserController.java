@@ -5,6 +5,7 @@ import org.recsys.dto.user.AuthResponse;
 import org.recsys.dto.user.InteractionRequest;
 import org.recsys.dto.user.OnboardingRequest;
 import org.recsys.dto.user.UserLoginRequest;
+import org.recsys.dto.user.UserPreferencesDto;
 import org.recsys.dto.user.UserResponse;
 import org.recsys.dto.user.UserSignupRequest;
 import org.recsys.service.UserInteractionsService;
@@ -14,6 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,14 +50,37 @@ public class UserController {
 
         UserResponse userRes = UserResponse.fromEntity(userService.login(request));
         boolean isNew = prefService.isUserUsingDefaultPreferences(userRes.getId());
-        String token = jwtUtils.generateToken(request.getEmail(), userRes.getId(), isNew);
+        String token = jwtUtils.generateToken(request.getEmail(), userRes.getId(), userRes.getName(), isNew);
 
         return ResponseEntity.ok(new AuthResponse(token, userRes));
     }
 
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteAccount(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{userId}/preferences")
+    public ResponseEntity<UserPreferencesDto> getUserPreferences(@PathVariable Long userId) {
+        return prefService.getUserPreferencesByUserId(userId).map(pref -> ResponseEntity.ok(new UserPreferencesDto(
+                pref.getUserId(),
+                pref.getExperienceLevel().name(),
+                pref.getPrepMethod().name())))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping("/preferences")
-    public ResponseEntity<?> updatePreferencesAfterSurvey(@RequestBody OnboardingRequest request) {
+    public ResponseEntity<Void> updatePreferencesAfterSurvey(@RequestBody OnboardingRequest request) {
         prefService.updateUserPreferencesAfterOnboarding(request);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/preferences/preparation")
+    public ResponseEntity<Void> updatePreferencesWithNewPrepMethod(@RequestBody OnboardingRequest request) {
+        prefService.updatePrepMethod(request);
 
         return ResponseEntity.ok().build();
     }

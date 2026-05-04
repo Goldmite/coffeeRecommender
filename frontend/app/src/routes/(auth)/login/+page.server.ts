@@ -2,6 +2,7 @@ import { fail, redirect, type Actions } from '@sveltejs/kit';
 import type { AuthResponse } from '$lib/types/auth';
 import { PUBLIC_API_BASE_URL } from '$env/static/public';
 import { m } from '$lib/paraglide/messages.js';
+import { localizeHref } from '$lib/paraglide/runtime';
 
 export const actions = {
 	default: async ({ request, fetch, cookies }) => {
@@ -30,6 +31,6 @@ export const actions = {
 			secure: true,
 			maxAge: 60 * 60 * 24,
 		});
-		throw redirect(303, '/home');
+		throw redirect(303, localizeHref('/home'));
 	},
 } satisfies Actions;

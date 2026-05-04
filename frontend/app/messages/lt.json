@@ -107,5 +107,12 @@
 	"rate_this_coffee": "Įvertinkite šią kavą!",
 	"previous": "Ankstesnis",
 	"next": "Toliau",
-	"date": "Data"
+	"date": "Data",
+	"user": "Vartotojas",
+  "profile": "Paskyra",
+  "profile_settings": "Paskyros nustatymai",
+  "logout": "Atsijungti",
+  "delete_account": "Ištrinti paskyrą",
+  "delete_confirmation": "Ar esate įsitikinę? Visi jūsų duomenys, nustatymai ir istorija bus ištrinti visam laikui.",
+  "adjust_preferences": "Koreguoti nustatymus"
 }

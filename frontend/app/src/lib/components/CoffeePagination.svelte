@@ -43,7 +43,7 @@
 			/>
 		{:else}
 			<tr
-				><td colspan="7" class="text-center italic p-10 text-lg bg-main-mid/10">
+				><td colspan="8" class="text-center italic p-10 text-lg bg-main-mid/10">
 					{m.no_purchased_coffees()}...
 				</td>
 			</tr>
@@ -52,13 +52,13 @@
 </table>
 {#if totalPages > 1}
 	<div class="flex flex-row justify-center gap-4 bg-main-mid py-1 text-sm italic">
-		<div class="w-16 text-right">
+		<div class="w-20 text-right">
 			<a href="?page={currentPage - 1}" class:invisible={currentPage === 0}>
 				{m.previous()}
 			</a>
 		</div>
 		<span>{currentPage + 1} / {totalPages}</span>
-		<div class="w-16 text-left">
+		<div class="w-20 text-left">
 			<a href="?page={currentPage + 1}" class:invisible={currentPage >= totalPages - 1}>
 				{m.next()}
 			</a>

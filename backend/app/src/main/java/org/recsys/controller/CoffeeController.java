@@ -12,6 +12,7 @@ import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +41,7 @@ public class CoffeeController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<CoffeeBeanResponse>> getAllCoffees() {
         return ResponseEntity.ok(coffeeService.getAllCoffees().stream().map(bean -> mapper.toResponse(bean)).toList());
     }
@@ -47,29 +49,33 @@ public class CoffeeController {
     @GetMapping("/purchased/user/{userId}")
     public ResponseEntity<Page<PurchasedCoffeeDto>> getPurchasedCoffeesByUser(@PathVariable Long userId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "5") int size) {
         return ResponseEntity.ok(interactionsService.findPurchasedCoffeesByUser(userId, page, size));
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CoffeeBeanResponse> addNewCoffee(@Valid @RequestBody CoffeeBeanRequest req) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(mapper.toResponse(coffeeService.addCoffee(req)));
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CoffeeBeanResponse> updateCoffee(@RequestParam Long id,
             @Valid @RequestBody CoffeeBeanRequest req) throws NotFoundException {
         return ResponseEntity.ok(mapper.toResponse(coffeeService.updateCoffee(id, req)));
     }
 
     @DeleteMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteCoffeeById(@RequestParam Long id) {
         coffeeService.deleteCoffeeById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/vector")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<CoffeeBeanResponse>> batchUpdateCoffeeVectors() {
         return ResponseEntity
                 .ok(coffeeService.batchUpdateCoffeeVectors().stream().map(bean -> mapper.toResponse(bean)).toList());

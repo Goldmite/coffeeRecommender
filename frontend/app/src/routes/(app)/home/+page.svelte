@@ -8,7 +8,7 @@
 	import PurchaseQueryForm from '$lib/components/PurchaseQueryForm.svelte';
 	import RecommendationList from '$lib/components/RecommendationList.svelte';
 	import ShopSelection from '$lib/components/ShopSelection.svelte';
-	import TasteOnboarding from '$lib/components/TasteOnboarding.svelte';
+	import TasteOnboarding from '$lib/components/TastePreferences.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import type { CoffeeBeanResponse, ShopResponse } from '$lib/types/recommendation';
 	import { tick } from 'svelte';

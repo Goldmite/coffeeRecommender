@@ -3,7 +3,7 @@
 </script>
 
 <button
-	class="btn-wide mt-4 bg-secondary font-semibold tracking-wide text-light"
+	class="btn-wide mt-4 bg-secondary font-semibold tracking-wide text-light disabled:pointer-events-none disabled:bg-main-mid"
 	type="submit"
 	formaction={formAction}
 	{disabled}>{@render children()}</button

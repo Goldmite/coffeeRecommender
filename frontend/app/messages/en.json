@@ -105,5 +105,12 @@
   "rate_this_coffee": "Rate this coffee!",
   "previous": "Previous",
   "next": "Next",
-  "date": "Date"
+  "date": "Date",
+  "user": "User",
+  "profile": "Profile",
+  "profile_settings": "Profile settings",
+  "logout": "Logout",
+  "delete_account": "Delete account",
+  "delete_confirmation": "Are you absolutely sure? All your data, preferences and history will be permanently deleted.",
+  "adjust_preferences": "Adjust your preferences"
 }
