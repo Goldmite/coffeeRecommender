@@ -47,6 +47,24 @@ public class CoffeeService {
     }
 
     @Transactional
+    public List<CoffeeBean> addCoffeeList(List<CoffeeBeanRequest> requests) {
+        List<CoffeeBean> coffeeBeans = requests.stream()
+                .map(req -> {
+                    CoffeeBean newCoffee = mapper.toEntity(req);
+                    Shop shopProxy = shopRepository.getReferenceById(req.getShopId());
+                    newCoffee.setShop(shopProxy);
+
+                    if (newCoffee.getFeatures() != null) {
+                        newCoffee.getFeatures().setCoffeeBean(newCoffee);
+                    }
+
+                    return newCoffee;
+                })
+                .toList();
+        return coffeeRepository.saveAll(coffeeBeans);
+    }
+
+    @Transactional
     public CoffeeBean updateCoffee(Long id, CoffeeBeanRequest req) throws NotFoundException {
         CoffeeBean bean = coffeeRepository.findById(id).orElseThrow(() -> new NotFoundException());
 

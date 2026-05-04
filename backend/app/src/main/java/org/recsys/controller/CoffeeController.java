@@ -60,6 +60,13 @@ public class CoffeeController {
                 .body(mapper.toResponse(coffeeService.addCoffee(req)));
     }
 
+    @PostMapping("/list")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<CoffeeBeanResponse>> addNewCoffee(@Valid @RequestBody List<CoffeeBeanRequest> req) {
+        return ResponseEntity
+                .ok(coffeeService.addCoffeeList(req).stream().map(bean -> mapper.toResponse(bean)).toList());
+    }
+
     @PutMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CoffeeBeanResponse> updateCoffee(@RequestParam Long id,
