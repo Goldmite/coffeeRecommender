@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,8 +53,15 @@ public class UserController {
         return ResponseEntity.ok(new AuthResponse(token, userRes));
     }
 
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteAccount(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/preferences")
-    public ResponseEntity<?> updatePreferencesAfterSurvey(@RequestBody OnboardingRequest request) {
+    public ResponseEntity<Void> updatePreferencesAfterSurvey(@RequestBody OnboardingRequest request) {
         prefService.updateUserPreferencesAfterOnboarding(request);
 
         return ResponseEntity.ok().build();

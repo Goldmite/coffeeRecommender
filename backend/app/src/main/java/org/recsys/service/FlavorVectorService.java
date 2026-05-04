@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FlavorVectorService {
 
+    private final WeightVectorService weightVectorService;
     private final CoffeeRepository repository;
 
     private static final Map<FlavorCategory, Set<String>> FLAVOR_WHEEL = new LinkedHashMap<>() {
@@ -65,6 +66,22 @@ public class FlavorVectorService {
             double idf = Math.log((double) size / (df + 1.0)) + 1.0;
             idfMap.put(category, idf);
         }
+    }
+
+    public float[] calculateVectorShift(float[] userVector, float[] coffeeVector, float alpha) {
+        if (userVector == null) {
+            return coffeeVector;
+        }
+        float[] shiftedVector = new float[userVector.length];
+
+        for (int i = 0; i < userVector.length; i++) {
+            // linear interpolation: uV + alpha * (cV - uV)
+            shiftedVector[i] = userVector[i] + alpha * (coffeeVector[i] - userVector[i]);
+            // precaution clamp
+            shiftedVector[i] = Math.max(-1.0f, Math.min(1.0f, shiftedVector[i]));
+        }
+        // renormalize vector
+        return weightVectorService.l2Normalize(shiftedVector);
     }
 
     public float[] getUnifiedFlavorVector(List<String> flavorNotes, String description) {

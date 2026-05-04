@@ -23,12 +23,15 @@ class FlavorVectorServiceTest {
     @Mock
     private CoffeeRepository repository;
 
+    @Mock
+    private WeightVectorService weightVectorService;
+
     private FlavorVectorService service;
     private List<String> mockDescriptions;
 
     @BeforeEach
     void setUp() {
-        service = new FlavorVectorService(repository);
+        service = new FlavorVectorService(weightVectorService, repository);
         mockDescriptions = Arrays.asList(
                 "There is dark chocolate and nuts",
                 "This coffee has citrus and berries notes",

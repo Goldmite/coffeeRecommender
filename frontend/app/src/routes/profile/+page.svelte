@@ -1,8 +1,16 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import Card from '$lib/components/core/Card.svelte';
-	import { m, user_email } from '$lib/paraglide/messages.js';
+	import { m } from '$lib/paraglide/messages.js';
 
 	let { data } = $props();
+
+	function handleDelete(event: MouseEvent) {
+		const confirmed = confirm(m.delete_confirmation());
+		if (!confirmed) {
+			event.preventDefault();
+		}
+	}
 </script>
 
 {#snippet profileInfo(key: string, value: string | undefined)}
@@ -18,6 +26,16 @@
 					{@render profileInfo(m.user_name(), data.user?.name)}
 					{@render profileInfo(m.user_email(), data.user?.email)}
 				</dl>
+
+				<hr class="my-2 border-main-border" />
+
+				<form method="POST" action="?/deleteAccount" use:enhance>
+					<button
+						class="btn-wide mt-4 bg-error font-semibold tracking-wide text-light hover:inset-shadow-md"
+						type="submit"
+						onclick={handleDelete}>{m.delete_account()}</button
+					>
+				</form>
 			</div>
 		</Card>
 	</div>

@@ -109,5 +109,7 @@
   "user": "User",
   "profile": "Profile",
   "profile_settings": "Profile settings",
-  "logout": "Logout"
+  "logout": "Logout",
+  "delete_account": "Delete account",
+  "delete_confirmation": "Are you absolutely sure? All your data, preferences and history will be permanently deleted."
 }
