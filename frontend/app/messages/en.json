@@ -111,5 +111,6 @@
   "profile_settings": "Profile settings",
   "logout": "Logout",
   "delete_account": "Delete account",
-  "delete_confirmation": "Are you absolutely sure? All your data, preferences and history will be permanently deleted."
+  "delete_confirmation": "Are you absolutely sure? All your data, preferences and history will be permanently deleted.",
+  "adjust_preferences": "Adjust your preferences"
 }

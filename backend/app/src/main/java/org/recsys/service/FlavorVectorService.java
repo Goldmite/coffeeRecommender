@@ -20,9 +20,11 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FlavorVectorService {
 
     private final WeightVectorService weightVectorService;
@@ -130,7 +132,7 @@ public class FlavorVectorService {
             }
             tokenStream.end();
         } catch (IOException e) {
-            // TODO: log error or return empty
+            log.error("Failed to tokenize coffee description.");
         }
         return result;
     }

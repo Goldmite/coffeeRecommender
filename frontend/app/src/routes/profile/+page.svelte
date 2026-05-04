@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import Card from '$lib/components/core/Card.svelte';
+	import TastePreferencesAdjustment from '$lib/components/TastePreferences.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 
 	let { data } = $props();
@@ -28,11 +29,21 @@
 				</dl>
 
 				<hr class="my-2 border-main-border" />
+				<form class="flex flex-col gap-4" method="POST" use:enhance>
+					<TastePreferencesAdjustment
+						headerTitle={m.adjust_preferences()}
+						initialPrepMethod={data.pref.prepMethod}
+						initialExperience={data.pref.experienceLevel}
+						formAction="?/preferences"
+						initialData={data.pref.prepMethod + ', ' + data.pref.experienceLevel}
+					/>
 
-				<form method="POST" action="?/deleteAccount" use:enhance>
+					<hr class="my-2 border-main-border" />
+
 					<button
 						class="btn-wide mt-4 bg-error font-semibold tracking-wide text-light hover:inset-shadow-md"
 						type="submit"
+						formaction="?/deleteAccount"
 						onclick={handleDelete}>{m.delete_account()}</button
 					>
 				</form>

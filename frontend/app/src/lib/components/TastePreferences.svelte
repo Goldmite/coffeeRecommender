@@ -5,17 +5,30 @@
 	import ActionButton from './core/ActionButton.svelte';
 	import ProgressSlider from './core/ProgressSlider.svelte';
 
+	let {
+		headerTitle = m.onboarding_title(),
+		initialPrepMethod = 'POUROVER',
+		initialExperience = 'BEGINNER',
+		formAction = '?/survey',
+		initialData = '',
+	} = $props();
+
 	const levels = Object.keys(experienceMap) as ExperienceLevel[];
 
-	let selectedPrepMethod = $state('POUROVER');
-
-	let selectedIdx = $state(0);
+	// svelte-ignore state_referenced_locally
+	let selectedPrepMethod = $state(initialPrepMethod);
+	// svelte-ignore state_referenced_locally
+	let selectedIdx = $state(levels.indexOf(initialExperience as ExperienceLevel) ?? 0);
 	const selectedLevel = $derived(levels[selectedIdx]);
 	const experienceLevel = $derived(experienceMap[selectedLevel]);
+
+	let isDisabled = $derived(
+		initialData.includes(selectedPrepMethod) && initialData.includes(selectedLevel),
+	);
 </script>
 
 <div class="onboarding-section space-y-3">
-	<h3 class="font-semibold">{m.onboarding_title()}</h3>
+	<h3 class="font-semibold">{headerTitle}</h3>
 
 	<div class="space-y-4">
 		<label for="prepMethod">
@@ -49,7 +62,7 @@
 		<input type="hidden" name="experience" value={selectedLevel} />
 	</div>
 
-	<ActionButton formAction="?/survey">{m.save()}</ActionButton>
+	<ActionButton {formAction} disabled={isDisabled}>{m.save()}</ActionButton>
 </div>
 
 <style>
