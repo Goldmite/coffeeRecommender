@@ -56,14 +56,14 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteAccount(@PathVariable Long userId) {
+    public ResponseEntity<Void> deleteAccount(@PathVariable("userId") Long userId) {
         userService.deleteUser(userId);
 
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{userId}/preferences")
-    public ResponseEntity<UserPreferencesDto> getUserPreferences(@PathVariable Long userId) {
+    public ResponseEntity<UserPreferencesDto> getUserPreferences(@PathVariable("userId") Long userId) {
         return prefService.getUserPreferencesByUserId(userId).map(pref -> ResponseEntity.ok(new UserPreferencesDto(
                 pref.getUserId(),
                 pref.getExperienceLevel().name(),

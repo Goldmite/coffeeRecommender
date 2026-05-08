@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -21,12 +22,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.recsys.dto.user.UserLoginRequest;
 import org.recsys.dto.user.UserSignupRequest;
 import org.recsys.model.User;
+import org.recsys.repository.UserInteractionsRepository;
+import org.recsys.repository.UserPreferencesRepository;
 import org.recsys.repository.UserRepository;
 import org.recsys.testutil.TestDataFactory;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -39,6 +44,12 @@ class UserServiceTest {
 
     @Mock
     private UserPreferencesService preferencesService;
+
+    @Mock
+    private UserInteractionsRepository interactionsRepository;
+
+    @Mock
+    private UserPreferencesRepository preferencesRepository;
 
     @InjectMocks
     UserService userService;
@@ -131,5 +142,29 @@ class UserServiceTest {
                 () -> userService.loadUserByUsername(nonExistentUsersEmail));
         assertTrue(exception.getMessage().contains("Invalid email or password"));
         verify(userRepository, times(1)).findByEmail(nonExistentUsersEmail);
+    }
+
+    @Test
+    void deleteUser_shouldDeleteUserAndInteractions_whenUserExists() {
+        // given
+        Long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.of(new User()));
+        // when
+        userService.deleteUser(userId);
+        // then
+        verify(preferencesRepository, times(1)).deleteByUserId(userId);
+        verify(interactionsRepository, times(1)).deleteByUserId(userId);
+        verify(userRepository, times(1)).deleteById(userId);
+    }
+
+    @Test
+    void deleteUser_shouldThrowException_whenUserDoesNotExist() {
+        // given
+        Long userId = 99L;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        // when & then
+        assertThrows(EntityNotFoundException.class, () -> userService.deleteUser(userId));
+        verifyNoInteractions(interactionsRepository);
+        verify(userRepository, never()).deleteById(anyLong());
     }
 }
