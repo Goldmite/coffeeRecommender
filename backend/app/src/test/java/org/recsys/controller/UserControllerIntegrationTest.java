@@ -2,6 +2,7 @@ package org.recsys.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -10,8 +11,12 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.recsys.config.TestConfig;
+import org.recsys.dto.user.InteractionRequest;
+import org.recsys.dto.user.OnboardingRequest;
 import org.recsys.dto.user.UserLoginRequest;
 import org.recsys.dto.user.UserSignupRequest;
+import org.recsys.model.ExperienceLevel;
+import org.recsys.model.PrepMethod;
 import org.recsys.model.User;
 import org.recsys.model.UserPreferences;
 import org.recsys.repository.UserPreferencesRepository;
@@ -68,6 +73,11 @@ class UserControllerIntegrationTest {
 
         UserPreferences prefs = new UserPreferences();
         prefs.setUser(user);
+        prefs.setExperienceLevel(ExperienceLevel.BEGINNER);
+        prefs.setPrepMethod(PrepMethod.OTHER);
+        float[] mockProfile = new float[30];
+        java.util.Arrays.fill(mockProfile, 0.5f);
+        prefs.setTasteProfile(mockProfile);
         preferencesRepository.save(prefs);
 
         return saved;
@@ -153,6 +163,65 @@ class UserControllerIntegrationTest {
                 .andExpect(status().isNoContent());
 
         assertFalse(userRepository.existsById(user.getId()));
+    }
+
+    @Test
+    void shouldUpdatePreferencesAfterSurvey() throws Exception {
+        // given
+        User user = prepareUser();
+        String token = getJwtToken();
+        OnboardingRequest request = new OnboardingRequest(user.getId(), ExperienceLevel.ADVANCED, PrepMethod.POUROVER);
+        // when
+        mockMvc.perform(post(USER_API + "/preferences")
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+        // then
+        mockMvc.perform(get(USER_API + "/{userId}/preferences", user.getId())
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.experienceLevel").value("ADVANCED"))
+                .andExpect(jsonPath("$.prepMethod").value("POUROVER"));
+    }
+
+    @Test
+    void shouldUpdatePrepMethodAndAdjustVector() throws Exception {
+        // given
+        User user = prepareUser();
+        String token = getJwtToken();
+        OnboardingRequest request = new OnboardingRequest(user.getId(), null, PrepMethod.COLD_BREW);
+        // when & then
+        mockMvc.perform(post(USER_API + "/preferences/preparation")
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getUserPreferences_ShouldReturnNotFound_WhenUserMissing() throws Exception {
+        // given
+        prepareUser();
+        String token = getJwtToken();
+        // when & then
+        mockMvc.perform(get(USER_API + "/99999404/preferences")
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void addUserInteraction_Success_ShouldReturnOk() throws Exception {
+        // given
+        User user = prepareUser();
+        String token = getJwtToken();
+        InteractionRequest request = new InteractionRequest(user.getId(), 1L, true, 4);
+        // when & then
+        mockMvc.perform(post(USER_API + "/interactions")
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
     }
 
     private String getJwtToken() throws Exception {

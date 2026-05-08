@@ -71,13 +71,13 @@ public class UserPreferencesService {
     @Transactional
     public void updatePrepMethod(OnboardingRequest request) {
         Long userId = request.userId();
-        PrepMethod newMethod = request.prepMethod();
-        ExperienceLevel newExperienceLevel = request.experience();
         UserPreferences pref = preferencesRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException());
 
         PrepMethod oldMethod = pref.getPrepMethod();
         ExperienceLevel oldExperienceLevel = pref.getExperienceLevel();
+        PrepMethod newMethod = request.prepMethod() != null ? request.prepMethod() : oldMethod;
+        ExperienceLevel newExperienceLevel = request.experience() != null ? request.experience() : oldExperienceLevel;
         if (oldMethod == newMethod && oldExperienceLevel == newExperienceLevel)
             return;
 
