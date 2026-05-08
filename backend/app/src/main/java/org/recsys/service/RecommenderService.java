@@ -51,7 +51,8 @@ public class RecommenderService {
         float cbfWeight = 1 - cfWeight;
 
         int candidateLimit = Math.min(Math.max(limit * 15, 50), 150); // 15x display limit in range [50-150]
-        List<Candidate> cfCandidates = getCFCandidates(userId, candidateLimit, filterRequest.shopIds());
+        List<Candidate> cfCandidates = cfWeight > 0 ? getCFCandidates(userId, candidateLimit, filterRequest.shopIds())
+                : List.of();
         List<Candidate> cbfCandidates = getCBFCandidates(userId, candidateLimit, filterRequest.shopIds(),
                 featureFilters);
 
