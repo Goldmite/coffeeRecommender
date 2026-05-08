@@ -4,6 +4,7 @@ import org.recsys.dto.user.UserLoginRequest;
 import org.recsys.dto.user.UserSignupRequest;
 import org.recsys.model.User;
 import org.recsys.repository.UserInteractionsRepository;
+import org.recsys.repository.UserPreferencesRepository;
 import org.recsys.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserInteractionsRepository interactionsRepository;
     private final UserPreferencesService preferencesService;
+    private final UserPreferencesRepository preferencesRepository;
 
     private static final String INVALID_EMAIL_OR_PASSWORD = "Invalid email or password";
     private static final String USER_ALREADY_EXISTS = "User already exists";
@@ -78,6 +80,7 @@ public class UserService implements UserDetailsService {
         if (userRepository.findById(id).isEmpty()) {
             throw new EntityNotFoundException();
         }
+        preferencesRepository.deleteByUserId(id);
         // delete interactions
         // TODO: can keep, but they will decay over time
         interactionsRepository.deleteByUserId(id);

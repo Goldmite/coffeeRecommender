@@ -7,9 +7,9 @@ import org.recsys.model.UserRole;
 
 public class TestDataFactory {
 
-    public static String testName = "John Pork";
-    public static String testEmail = "john.pork@test.com";
-    public static String testPassword = "AS()*J#M@IHAKa40k";
+    public final static String testName = "John Pork";
+    public final static String testEmail = "john.pork@test.com";
+    public final static String testPassword = "AS()*J#M@IHAKa40k";
 
     public static User createUser() {
         return createUser(testName, testEmail, testPassword);

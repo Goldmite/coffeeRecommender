@@ -1,8 +1,10 @@
 package org.recsys.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +25,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import com.jayway.jsonpath.JsonPath;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -136,5 +140,32 @@ class UserControllerIntegrationTest {
                 .content(mapper.writeValueAsString(invalidReq)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.email").exists());
+    }
+
+    @Test
+    void deleteUser_shouldReturnNoContent_whenUserExists() throws Exception {
+        // given
+        User user = prepareUser();
+        String token = getJwtToken();
+        // when & then
+        mockMvc.perform(delete(USER_API + "/" + user.getId().toString())
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isNoContent());
+
+        assertFalse(userRepository.existsById(user.getId()));
+    }
+
+    private String getJwtToken() throws Exception {
+        UserLoginRequest loginReq = TestDataFactory.validLogin();
+
+        String response = mockMvc.perform(post(USER_API + "/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(loginReq)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        return JsonPath.read(response, "$.token");
     }
 }
