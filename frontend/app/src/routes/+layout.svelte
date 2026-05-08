@@ -5,6 +5,7 @@
 	import { getLocale, localizeHref, setLocale } from '$lib/paraglide/runtime';
 	import SubmitButton from '$lib/components/core/SubmitButton.svelte';
 	import { slide } from 'svelte/transition';
+	import { onMount } from 'svelte';
 
 	let { data, children } = $props();
 
@@ -23,20 +24,26 @@
 	function closeDropdown() {
 		if (isDropdownOpen) isDropdownOpen = false;
 	}
-</script>
+	onMount(() => {
+		if (typeof window === 'undefined') return;
 
-<svelte:head>
-	<link rel="icon" href={favicon} />
-	<script>
-		const theme = localStorage.getItem('theme');
-		const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+		const theme = typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null;
+
+		const systemDark =
+			typeof window.matchMedia === 'function'
+				? window.matchMedia('(prefers-color-scheme: dark)').matches
+				: false;
 
 		if (theme === 'dark' || (!theme && systemDark)) {
 			document.documentElement.classList.add('dark');
 		} else {
 			document.documentElement.classList.remove('dark');
 		}
-	</script>
+	});
+</script>
+
+<svelte:head>
+	<link rel="icon" href={favicon} />
 </svelte:head>
 
 <svelte:window onclick={closeDropdown} />
