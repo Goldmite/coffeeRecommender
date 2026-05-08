@@ -2,6 +2,7 @@ package org.recsys.auth;
 
 import java.io.IOException;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,21 +32,26 @@ class JwtAuthenticationFilterTest {
 
     @Mock
     private JwtUtils jwtUtils;
-    @Mock
-    private UserService userService;
-    @Mock
-    private UserRepository userRepository;
-    @Mock
-    private UserDetailsService userDetailsService;
+
     @Mock
     private FilterChain filterChain;
+
     @Mock
     private HttpServletRequest request;
+
     @Mock
     private HttpServletResponse response;
 
+    @Mock
+    private UserDetailsService userDetailsService;
+
     @InjectMocks
     private JwtAuthenticationFilter jwtFilter;
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     void shouldSetAuthContext_WhenTokenIsValid() throws ServletException, IOException {
@@ -59,12 +65,19 @@ class JwtAuthenticationFilterTest {
                 .authorities("ROLE_USER")
                 .build();
 
+        // 1. Setup Header
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
+
+        // 2. Setup JWT Utils
         when(jwtUtils.validateToken(token)).thenReturn(true);
         when(jwtUtils.getEmailFromToken(token)).thenReturn(email);
+
+        // 3. Setup Service - THIS must match the field name in JwtAuthenticationFilter
         when(userDetailsService.loadUserByUsername(email)).thenReturn(mockUserDetails);
+
         // when
         jwtFilter.doFilter(request, response, filterChain);
+
         // then
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         assertNotNull(auth, "Authentication should not be null");
