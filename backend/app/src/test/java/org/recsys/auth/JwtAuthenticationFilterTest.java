@@ -10,8 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.recsys.config.jwt.JwtAuthenticationFilter;
 import org.recsys.config.jwt.JwtUtils;
-import org.recsys.repository.UserRepository;
-import org.recsys.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
