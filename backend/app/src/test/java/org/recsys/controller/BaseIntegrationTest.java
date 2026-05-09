@@ -10,6 +10,7 @@ import org.recsys.model.ExperienceLevel;
 import org.recsys.model.PrepMethod;
 import org.recsys.model.User;
 import org.recsys.model.UserPreferences;
+import org.recsys.model.UserRole;
 import org.recsys.repository.UserPreferencesRepository;
 import org.recsys.repository.UserRepository;
 import org.recsys.testutil.TestDataFactory;
@@ -71,15 +72,13 @@ public abstract class BaseIntegrationTest {
     }
 
     private User prepareUser() {
-        User user = new User();
-        user.setName(TestDataFactory.testName);
-        user.setEmail(TestDataFactory.testEmail);
-        user.setPasswordHash(passwordEncoder.encode(TestDataFactory.testPassword));
+        User user = TestDataFactory.createUser();
+        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
+        user.setRole(UserRole.ADMIN);
         User saved = userRepository.saveAndFlush(user);
 
         UserPreferences prefs = new UserPreferences();
         prefs.setUser(saved);
-        // prefs.setUserId(saved.getId());
         prefs.setExperienceLevel(ExperienceLevel.BEGINNER);
         prefs.setPrepMethod(PrepMethod.OTHER);
 
@@ -95,9 +94,7 @@ public abstract class BaseIntegrationTest {
     }
 
     private String fetchJwtToken() throws Exception {
-        UserLoginRequest loginReq = new UserLoginRequest(
-                TestDataFactory.testEmail,
-                TestDataFactory.testPassword);
+        UserLoginRequest loginReq = TestDataFactory.validLogin();
 
         String response = mockMvc.perform(post("/api/users/login")
                 .contentType(MediaType.APPLICATION_JSON)

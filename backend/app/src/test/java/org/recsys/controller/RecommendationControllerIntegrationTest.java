@@ -30,7 +30,7 @@ class RecommendationControllerIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private ObjectMapper mapper;
 
-    private final String BASE_URL = "/api/recommendation";
+    private static final String BASE_URL = "/api/recommendation";
 
     @Test
     void getRecommendations_NoFilters() throws Exception {
