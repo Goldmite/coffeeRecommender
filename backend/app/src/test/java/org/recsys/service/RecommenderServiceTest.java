@@ -3,6 +3,7 @@ package org.recsys.service;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -92,7 +93,7 @@ class RecommenderServiceTest {
         SimilarCoffees mockSimilar = mock(SimilarCoffees.class);
         when(mockSimilar.getId()).thenReturn(100L);
         when(mockSimilar.getSimilarityScore()).thenReturn(0.9); // (0.8 + 1) / 2
-        when(coffeeRepository.findTopSimilarCoffeeCandidates(any(), anyInt(), eq(shops)))
+        when(coffeeRepository.findTopSimilarCoffeeCandidates(any(), anyInt(), eq(shops), anyBoolean()))
                 .thenReturn(List.of(mockSimilar));
 
         // 2. Mock CF Path
@@ -115,7 +116,7 @@ class RecommenderServiceTest {
 
         // Score should be weighted sum of CF (4.5/5.0 * weight) and CBF (0.9 * weight)
         assertTrue(topRec.score() > 0);
-        verify(coffeeRepository).findTopSimilarCoffeeCandidates(any(), anyInt(), eq(shops));
+        verify(coffeeRepository).findTopSimilarCoffeeCandidates(any(), anyInt(), eq(shops), anyBoolean());
         verify(mockModel).predict(eq(userId), eq(100L), anyLong());
     }
 
@@ -133,7 +134,7 @@ class RecommenderServiceTest {
         // Mock dependencies to allow method to finish
         when(preferencesService.getUserPreferenceFlavorProfile(userId)).thenReturn(new float[30]);
         when(weightVectorService.getBaseWeightVector()).thenReturn(new float[30]);
-        when(coffeeRepository.findTopSimilarCoffeeCandidates(any(), anyInt(), any()))
+        when(coffeeRepository.findTopSimilarCoffeeCandidates(any(), anyInt(), any(), anyBoolean()))
                 .thenReturn(Collections.emptyList());
         when(provider.getCurrentModel()).thenReturn(Optional.empty());
 
@@ -187,11 +188,11 @@ class RecommenderServiceTest {
 
         // WHEN
         // Accessing via getHybridRecommendations to see the weight effect
-        RecommendationFilterRequest req = new RecommendationFilterRequest(List.of(1), null);
+        RecommendationFilterRequest req = new RecommendationFilterRequest(null, null);
         when(weightMapper.toFilterMap(any())).thenReturn(null);
         when(preferencesService.getUserPreferenceFlavorProfile(userId)).thenReturn(new float[30]);
         when(weightVectorService.getBaseWeightVector()).thenReturn(new float[30]);
-        when(coffeeRepository.findTopSimilarCoffeeCandidates(any(), anyInt(), any()))
+        when(coffeeRepository.findTopSimilarCoffeeCandidates(any(), anyInt(), any(), anyBoolean()))
                 .thenReturn(Collections.emptyList());
 
         recommenderService.getHybridRecommendations(userId, 10, req);

@@ -43,7 +43,8 @@ public class RecommenderService {
             RecommendationFilterRequest filterRequest) {
 
         Map<Integer, Float> featureFilters = weightMapper.toFilterMap(filterRequest.featureFilter());
-        List<Integer> shopFilter = filterRequest.shopIds() != null ? filterRequest.shopIds() : List.of();
+        List<Integer> shopFilter = (filterRequest.shopIds() == null || filterRequest.shopIds().isEmpty()) ? null
+                : filterRequest.shopIds();
         float cfWeight = determineCfWeight(userId);
         // intent-based (filters applied) lean more on CBF
         if (featureFilters != null && !featureFilters.isEmpty()) {
@@ -95,7 +96,8 @@ public class RecommenderService {
 
         float[] target = prepareTargetVector(userProfile, sessionFilters);
 
-        List<SimilarCoffees> coffees = coffeeRepository.findTopSimilarCoffeeCandidates(target, n, shopIds);
+        List<SimilarCoffees> coffees = coffeeRepository.findTopSimilarCoffeeCandidates(target, n, shopIds,
+                shopIds == null);
 
         return coffees.stream().map(c -> new Candidate(c.getId(), c.getSimilarityScore().floatValue(), "CBF")).toList();
     }

@@ -28,12 +28,12 @@ public interface CoffeeRepository extends JpaRepository<CoffeeBean, Long> {
                         FROM coffee_beans c
                         JOIN coffee_features f ON c.id = f.coffee_id
                         WHERE f.flavor_vector IS NOT NULL
-                        AND (:shopIds IS NULL OR c.shop_id IN :shopIds)
+                        AND (:allShops = true OR c.shop_id IN (:shopIds))
                         ORDER BY similarity DESC
                         LIMIT :n
                         """, nativeQuery = true)
         List<SimilarCoffees> findTopSimilarCoffeeCandidates(@Param("vector") float[] vector, @Param("n") int n,
-                        @Param("shopIds") Iterable<Integer> shopIds);
+                        @Param("shopIds") Iterable<Integer> shopIds, @Param("allShops") boolean allShops);
 
         @Query("SELECT i FROM UserInteractions i JOIN FETCH i.coffeeBean WHERE i.userId = :userId AND i.isPurchased = true ORDER BY i.purchaseDate DESC")
         Page<UserInteractions> findPurchasedCoffeesByUserId(@Param("userId") Long userId, Pageable pageable);

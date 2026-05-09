@@ -14,6 +14,7 @@ import org.recsys.dto.coffee.CoffeeVectorizationDto;
 import org.recsys.dto.shop.ShopResponse;
 import org.recsys.model.CoffeeBean;
 import org.recsys.model.CoffeeFeatures;
+import org.recsys.model.Processing;
 import org.recsys.model.Shop;
 
 import io.hypersistence.utils.hibernate.type.range.Range;
@@ -69,10 +70,10 @@ public interface CoffeeMapper {
 
     @Mapping(target = "coffeeId", source = "id")
     @Mapping(target = "origins", source = "features.origins", qualifiedByName = "mapOrigins")
-    @Mapping(target = "process", source = "features.process")
+    @Mapping(target = "process", source = "features.process", qualifiedByName = "mapProcessingToString")
     @Mapping(target = "roastLevel", source = "features.roastLevel")
     @Mapping(target = "description", source = "features.description")
-    @Mapping(target = "altitude", source = "features.altitude")
+    @Mapping(target = "altitude", source = "features.altitude", qualifiedByName = "rangeToRange")
     @Mapping(target = "scaScore", source = "features.scaScore", defaultValue = "80")
     @Mapping(target = "acidity", source = "features.acidity", defaultValue = "5")
     @Mapping(target = "body", source = "features.body", defaultValue = "5")
@@ -103,6 +104,11 @@ public interface CoffeeMapper {
                 .toList();
     }
 
+    @Named("mapProcessingToString")
+    default String mapProcessingToString(Processing process) {
+        return (process != null) ? process.getProcess() : Processing.OTHER.getProcess();
+    }
+
     /**
      * Custom mapping for List<Integer> to Range<Integer>
      * 
@@ -124,8 +130,16 @@ public interface CoffeeMapper {
      */
     default List<Integer> mapRangeToList(Range<Integer> range) {
         if (range == null || range.isEmpty())
-            return null;
+            return List.of(0, 2500);
 
         return List.of(range.lower(), range.upper() - 1);
+    }
+
+    @Named("rangeToRange")
+    default Range<Integer> rangeToRange(Range<Integer> range) {
+        if (range == null || range.isEmpty()) {
+            return Range.closed(0, 2500);
+        }
+        return range;
     }
 }
