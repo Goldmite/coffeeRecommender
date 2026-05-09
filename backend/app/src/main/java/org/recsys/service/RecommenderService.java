@@ -43,6 +43,7 @@ public class RecommenderService {
             RecommendationFilterRequest filterRequest) {
 
         Map<Integer, Float> featureFilters = weightMapper.toFilterMap(filterRequest.featureFilter());
+        List<Integer> shopFilter = filterRequest.shopIds() != null ? filterRequest.shopIds() : List.of();
         float cfWeight = determineCfWeight(userId);
         // intent-based (filters applied) lean more on CBF
         if (featureFilters != null && !featureFilters.isEmpty()) {
@@ -51,9 +52,9 @@ public class RecommenderService {
         float cbfWeight = 1 - cfWeight;
 
         int candidateLimit = Math.min(Math.max(limit * 15, 50), 150); // 15x display limit in range [50-150]
-        List<Candidate> cfCandidates = cfWeight > 0 ? getCFCandidates(userId, candidateLimit, filterRequest.shopIds())
+        List<Candidate> cfCandidates = cfWeight > 0 ? getCFCandidates(userId, candidateLimit, shopFilter)
                 : List.of();
-        List<Candidate> cbfCandidates = getCBFCandidates(userId, candidateLimit, filterRequest.shopIds(),
+        List<Candidate> cbfCandidates = getCBFCandidates(userId, candidateLimit, shopFilter,
                 featureFilters);
 
         Map<Long, Float> hybridScores = new HashMap<>();

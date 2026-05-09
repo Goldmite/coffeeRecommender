@@ -177,7 +177,7 @@ class UserPreferencesServiceTest {
         float[] mockReturn = new float[10];
         when(vectorService.createFlavorVector(any(CoffeeVectorizationDto.class))).thenReturn(mockReturn);
         // when
-        userPreferencesService.calculateNewUserVector(request);
+        userPreferencesService.calculateNewUserVector(request, false);
         // then
         var dtoCaptor = org.mockito.ArgumentCaptor.forClass(CoffeeVectorizationDto.class);
         verify(vectorService).createFlavorVector(dtoCaptor.capture());
@@ -195,7 +195,7 @@ class UserPreferencesServiceTest {
         float[] mockReturn = new float[10];
         when(vectorService.createFlavorVector(any(CoffeeVectorizationDto.class))).thenReturn(mockReturn);
         // when
-        userPreferencesService.calculateNewUserVector(request);
+        userPreferencesService.calculateNewUserVector(request, true);
         // then
         var dtoCaptor = org.mockito.ArgumentCaptor.forClass(CoffeeVectorizationDto.class);
         verify(vectorService).createFlavorVector(dtoCaptor.capture());
