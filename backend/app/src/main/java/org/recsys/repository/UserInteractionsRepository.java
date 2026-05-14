@@ -1,7 +1,10 @@
 package org.recsys.repository;
 
+import java.util.List;
+
 import org.recsys.model.UserInteractions;
 import org.recsys.model.keys.UserInteractionId;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,4 +21,11 @@ public interface UserInteractionsRepository extends JpaRepository<UserInteractio
     @Transactional
     @Query("DELETE FROM UserInteractions ui WHERE ui.userId = :userId")
     void deleteByUserId(@Param("userId") Long userId);
+
+    long countByUserIdAndCoffeeIdIn(Long userId, List<Long> coffeeIds);
+
+    @Query("SELECT ui.coffeeId FROM UserInteractions ui " +
+            "GROUP BY ui.coffeeId " +
+            "ORDER BY COUNT(ui.userId) DESC")
+    List<Long> findTopPopularCoffeeIds(Pageable pageable);
 }
