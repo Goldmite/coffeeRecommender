@@ -84,7 +84,7 @@ public class ModelLifecycleManager {
 
         this.systemMaturity = userFactor * densityFactor;
 
-        log.info("System maturity updated: %f", this.systemMaturity);
+        log.info("System maturity updated: " + this.systemMaturity * 100 + " %");
     }
 
     public float getSystemMaturity() {

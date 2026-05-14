@@ -58,7 +58,7 @@ public class UserPreferencesService {
         pref.setExperienceLevel(request.experience());
         pref.setPrepMethod(request.prepMethod());
 
-        float[] adjustedFlavorProfile = calculateNewUserVector(request);
+        float[] adjustedFlavorProfile = calculateNewUserVector(request, true);
         pref.setTasteProfile(adjustedFlavorProfile);
 
         preferencesRepository.save(pref);
@@ -71,13 +71,13 @@ public class UserPreferencesService {
     @Transactional
     public void updatePrepMethod(OnboardingRequest request) {
         Long userId = request.userId();
-        PrepMethod newMethod = request.prepMethod();
-        ExperienceLevel newExperienceLevel = request.experience();
         UserPreferences pref = preferencesRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException());
 
         PrepMethod oldMethod = pref.getPrepMethod();
         ExperienceLevel oldExperienceLevel = pref.getExperienceLevel();
+        PrepMethod newMethod = request.prepMethod() != null ? request.prepMethod() : oldMethod;
+        ExperienceLevel newExperienceLevel = request.experience() != null ? request.experience() : oldExperienceLevel;
         if (oldMethod == newMethod && oldExperienceLevel == newExperienceLevel)
             return;
 
@@ -85,10 +85,10 @@ public class UserPreferencesService {
 
         // generate the original base for the old method to know the baseline
         OnboardingRequest oldRequest = new OnboardingRequest(userId, oldExperienceLevel, oldMethod);
-        float[] oldBase = calculateNewUserVector(oldRequest);
+        float[] oldBase = calculateNewUserVector(oldRequest, false);
         // generate the new base for the new method
         OnboardingRequest newRequest = new OnboardingRequest(userId, newExperienceLevel, newMethod);
-        float[] newBase = calculateNewUserVector(newRequest);
+        float[] newBase = calculateNewUserVector(newRequest, false);
         // compare the current to old baseline to extract history
         float[] prefHistory = new float[currentVector.length];
         for (int i = 0; i < currentVector.length; i++) {
@@ -110,7 +110,7 @@ public class UserPreferencesService {
         preferencesRepository.save(pref);
     }
 
-    public float[] calculateNewUserVector(OnboardingRequest request) {
+    public float[] calculateNewUserVector(OnboardingRequest request, boolean isInitialOnboarding) {
         int acidity = 5;
         int body = 5;
         int aftertaste = 5;
@@ -192,8 +192,9 @@ public class UserPreferencesService {
 
         float[] adjustedVector = vectorService.createFlavorVector(dto);
 
-        adjustedVector[8] = 0; // origin type (single/blend)
-
+        if (isInitialOnboarding) {
+            adjustedVector[8] = 0; // origin type (single/blend)
+        }
         return adjustedVector;
     }
 

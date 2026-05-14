@@ -2,39 +2,32 @@ package org.recsys.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.recsys.config.TestConfig;
+import org.recsys.dto.user.InteractionRequest;
+import org.recsys.dto.user.OnboardingRequest;
 import org.recsys.dto.user.UserLoginRequest;
 import org.recsys.dto.user.UserSignupRequest;
-import org.recsys.model.User;
-import org.recsys.model.UserPreferences;
-import org.recsys.repository.UserPreferencesRepository;
+import org.recsys.model.ExperienceLevel;
+import org.recsys.model.PrepMethod;
 import org.recsys.repository.UserRepository;
 import org.recsys.testutil.TestDataFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-
-import com.jayway.jsonpath.JsonPath;
 
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest
-@ActiveProfiles("test")
 @AutoConfigureMockMvc
-@Import(TestConfig.class)
-class UserControllerIntegrationTest {
+class UserControllerIntegrationTest extends BaseIntegrationTest {
 
     private static String USER_API = "/api/users";
 
@@ -45,37 +38,13 @@ class UserControllerIntegrationTest {
     private UserRepository userRepository;
 
     @Autowired
-    private UserPreferencesRepository preferencesRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private ObjectMapper mapper;
-
-    @BeforeEach
-    void setUp() {
-        preferencesRepository.deleteAll();
-        userRepository.deleteAll();
-    }
-
-    private User prepareUser() {
-        User user = new User();
-        user.setName(TestDataFactory.testName);
-        user.setEmail(TestDataFactory.testEmail);
-        user.setPasswordHash(passwordEncoder.encode(TestDataFactory.testPassword));
-        User saved = userRepository.save(user);
-
-        UserPreferences prefs = new UserPreferences();
-        prefs.setUser(user);
-        preferencesRepository.save(prefs);
-
-        return saved;
-    }
 
     @Test
     void signup_shouldBeSuccessful_whenRequestIsValid() throws Exception {
         // given
+        preferencesRepository.deleteAll();
+        userRepository.deleteAll();
         UserSignupRequest req = TestDataFactory.validSignup();
         // when & then
         mockMvc.perform(post(USER_API + "/signup")
@@ -89,6 +58,8 @@ class UserControllerIntegrationTest {
     @Test
     void signup_shouldReturnBadRequest_whenRequestIsInvalid() throws Exception {
         // given
+        preferencesRepository.deleteAll();
+        userRepository.deleteAll();
         UserSignupRequest invalidReq = TestDataFactory.invalidSignup();
         // when & then
         mockMvc.perform(post(USER_API + "/signup")
@@ -104,7 +75,6 @@ class UserControllerIntegrationTest {
     void login_shouldBeSuccessful() throws Exception {
         // given
         UserLoginRequest req = TestDataFactory.validLogin();
-        prepareUser();
         // when & then
         mockMvc.perform(post(USER_API + "/login")
                 .with(csrf())
@@ -119,7 +89,6 @@ class UserControllerIntegrationTest {
         // given
         UserLoginRequest req = TestDataFactory.validLogin();
         req.setPassword("wrong password");
-        prepareUser();
         // when & then
         mockMvc.perform(post(USER_API + "/login")
                 .with(csrf())
@@ -132,7 +101,6 @@ class UserControllerIntegrationTest {
     void login_shouldReturnBadRequest_whenRequestIsInvalid() throws Exception {
         // given
         UserLoginRequest invalidReq = TestDataFactory.invalidLogin();
-        prepareUser();
         // when & then
         mockMvc.perform(post(USER_API + "/login")
                 .with(csrf())
@@ -145,27 +113,63 @@ class UserControllerIntegrationTest {
     @Test
     void deleteUser_shouldReturnNoContent_whenUserExists() throws Exception {
         // given
-        User user = prepareUser();
-        String token = getJwtToken();
+        Long userId = testUser.getId();
         // when & then
-        mockMvc.perform(delete(USER_API + "/" + user.getId().toString())
-                .header("Authorization", "Bearer " + token))
+        mockMvc.perform(delete(USER_API + "/" + userId.toString())
+                .header("Authorization", token))
                 .andExpect(status().isNoContent());
 
-        assertFalse(userRepository.existsById(user.getId()));
+        assertFalse(userRepository.existsById(userId));
     }
 
-    private String getJwtToken() throws Exception {
-        UserLoginRequest loginReq = TestDataFactory.validLogin();
-
-        String response = mockMvc.perform(post(USER_API + "/login")
+    @Test
+    void shouldUpdatePreferencesAfterSurvey() throws Exception {
+        // given
+        OnboardingRequest request = new OnboardingRequest(testUser.getId(), ExperienceLevel.ADVANCED,
+                PrepMethod.POUROVER);
+        // when
+        mockMvc.perform(post(USER_API + "/preferences")
+                .header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(loginReq)))
+                .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+        // then
+        mockMvc.perform(get(USER_API + "/{userId}/preferences", testUser.getId())
+                .header("Authorization", token))
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+                .andExpect(jsonPath("$.experienceLevel").value("ADVANCED"))
+                .andExpect(jsonPath("$.prepMethod").value("POUROVER"));
+    }
 
-        return JsonPath.read(response, "$.token");
+    @Test
+    void shouldUpdatePrepMethodAndAdjustVector() throws Exception {
+        // given
+        OnboardingRequest request = new OnboardingRequest(testUser.getId(), null, PrepMethod.COLD_BREW);
+        // when & then
+        mockMvc.perform(post(USER_API + "/preferences/preparation")
+                .header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getUserPreferences_ShouldReturnNotFound_WhenUserMissing() throws Exception {
+        // when & then
+        mockMvc.perform(get(USER_API + "/99999404/preferences")
+                .header("Authorization", token))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void addUserInteraction_Success_ShouldReturnOk() throws Exception {
+        // given
+        InteractionRequest request = new InteractionRequest(testUser.getId(), 1L, true, 4);
+        // when & then
+        mockMvc.perform(post(USER_API + "/interactions")
+                .header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
     }
 }

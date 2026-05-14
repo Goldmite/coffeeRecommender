@@ -27,6 +27,7 @@ import org.recsys.dto.coffee.CoffeeVectorizationDto;
 import org.recsys.mapper.CoffeeMapper;
 import org.recsys.model.CoffeeBean;
 import org.recsys.model.CoffeeFeatures;
+import org.recsys.model.Shop;
 import org.recsys.repository.CoffeeRepository;
 import org.recsys.repository.ShopRepository;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
@@ -95,6 +96,36 @@ public class CoffeeServiceTest {
         // then
         assertEquals(entity, features.getCoffeeBean());
         verify(coffeeRepository).save(entity);
+    }
+
+    @Test
+    void shouldAddCoffeeListByRequest() {
+        // given
+        Integer shopId = 10;
+        CoffeeBeanRequest request = new CoffeeBeanRequest();
+        request.setShopId(shopId);
+
+        CoffeeBean beanEntity = new CoffeeBean();
+        CoffeeFeatures features = new CoffeeFeatures();
+        beanEntity.setFeatures(features);
+
+        Shop shopProxy = new Shop();
+        shopProxy.setId(shopId);
+
+        when(mapper.toEntity(request)).thenReturn(beanEntity);
+        when(shopRepository.getReferenceById(shopId)).thenReturn(shopProxy);
+        when(coffeeRepository.saveAll(anyList())).thenAnswer(inv -> inv.getArgument(0));
+        // when
+        List<CoffeeBean> result = coffeeService.addCoffeeList(List.of(request));
+        // then
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        CoffeeBean savedBean = result.get(0);
+        assertEquals(shopProxy, savedBean.getShop());
+        assertEquals(savedBean, savedBean.getFeatures().getCoffeeBean());
+
+        verify(shopRepository).getReferenceById(shopId);
+        verify(coffeeRepository).saveAll(anyList());
     }
 
     @Test

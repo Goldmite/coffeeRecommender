@@ -62,7 +62,7 @@ public class CoffeeController {
 
     @PostMapping("/list")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<CoffeeBeanResponse>> addNewCoffee(@Valid @RequestBody List<CoffeeBeanRequest> req) {
+    public ResponseEntity<List<CoffeeBeanResponse>> addNewCoffeeList(@Valid @RequestBody List<CoffeeBeanRequest> req) {
         return ResponseEntity
                 .ok(coffeeService.addCoffeeList(req).stream().map(bean -> mapper.toResponse(bean)).toList());
     }
